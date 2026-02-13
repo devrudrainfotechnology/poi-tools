@@ -4,22 +4,81 @@
 <title>POI Collection Tool</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/togeojson@0.16.0/dist/togeojson.js"></script>
+
+<style>
+body { margin:0; font-family:Arial; }
+#map { height:90vh; }
+#controls {
+    padding:10px;
+    background:#f4f4f4;
+}
+</style>
 
 </head>
 <body>
 
-<h2>POI Collection Tool</h2>
+<div id="controls">
+    <b>Upload KML file:</b>
+    <input type="file" id="kmlFile" accept=".kml,.kmz" multiple>
+</div>
 
 <div id="map"></div>
 
-<div id="panel">
-<h3>KML Layers</h3>
-<div id="layerList"></div>
-</div>
+<script>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="script.js"></script>
+// Map init
+var map = L.map('map').setView([31.6340, 74.8723], 12);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19
+}).addTo(map);
+
+var kmlLayers = [];
+
+// File upload handler
+document.getElementById('kmlFile').addEventListener('change', function(e){
+
+    var files = e.target.files;
+
+    for(let file of files){
+
+        var reader = new FileReader();
+
+        reader.onload = function(event){
+
+            var parser = new DOMParser();
+            var kml = parser.parseFromString(event.target.result, "text/xml");
+
+            var geojson = toGeoJSON.kml(kml);
+
+            var layer = L.geoJSON(geojson, {
+
+                pointToLayer: function(feature, latlng){
+                    return L.marker(latlng);
+                },
+
+                onEachFeature: function(feature, layer){
+                    if(feature.properties.name){
+                        layer.bindPopup(feature.properties.name);
+                    }
+                }
+
+            }).addTo(map);
+
+            kmlLayers.push(layer);
+
+            map.fitBounds(layer.getBounds());
+
+        };
+
+        reader.readAsText(file);
+    }
+
+});
+
+</script>
 
 </body>
 </html>
