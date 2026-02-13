@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>POI Collection Tool</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -8,75 +9,185 @@
 <script src="https://unpkg.com/togeojson@0.16.0/dist/togeojson.js"></script>
 
 <style>
-body { margin:0; font-family:Arial; }
-#map { height:90vh; }
-#controls {
-    padding:10px;
-    background:#f4f4f4;
+
+body{
+font-family:Arial;
+margin:0;
 }
+
+#map{
+height:60vh;
+}
+
+#streetview{
+height:300px;
+}
+
+#form{
+padding:10px;
+background:#f5f5f5;
+}
+
+input{
+margin:3px;
+}
+
 </style>
 
 </head>
 <body>
 
-<div id="controls">
-    <b>Upload KML file:</b>
-    <input type="file" id="kmlFile" accept=".kml,.kmz" multiple>
-</div>
+<h2>POI Collection Tool</h2>
+
+Upload KML:
+<input type="file" id="kmlFile" multiple accept=".kml">
 
 <div id="map"></div>
 
+<div id="streetview"></div>
+
+<div id="form">
+
+POI Name:
+<input id="poi_name">
+
+Category:
+<input id="category">
+
+Sub Category:
+<input id="sub_cat">
+
+Mobile:
+<input id="mobile">
+
+<br>
+
+Display Lat:
+<input id="display_lat">
+
+Display Lon:
+<input id="display_lon">
+
+Building Lat:
+<input id="build_lat">
+
+Building Lon:
+<input id="build_lon">
+
+<br>
+
+<button onclick="savePOI()">Save</button>
+
+<a href="export.php" target="_blank">
+<button>Export Excel</button>
+</a>
+
+</div>
+
 <script>
 
-// Map init
-var map = L.map('map').setView([31.6340, 74.8723], 12);
+var map = L.map('map').setView([31.6340,74.8723],13);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    maxZoom:19
-}).addTo(map);
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map);
 
-var kmlLayers = [];
+var marker;
 
-// File upload handler
-document.getElementById('kmlFile').addEventListener('change', function(e){
+map.on('click',function(e){
 
-    var files = e.target.files;
+if(marker)
+map.removeLayer(marker);
 
-    for(let file of files){
+marker=L.marker(e.latlng).addTo(map);
 
-        var reader = new FileReader();
+document.getElementById("display_lat").value=e.latlng.lat;
+document.getElementById("display_lon").value=e.latlng.lng;
 
-        reader.onload = function(event){
+document.getElementById("build_lat").value=e.latlng.lat;
+document.getElementById("build_lon").value=e.latlng.lng;
 
-            var parser = new DOMParser();
-            var kml = parser.parseFromString(event.target.result, "text/xml");
-
-            var geojson = toGeoJSON.kml(kml);
-
-            var layer = L.geoJSON(geojson, {
-
-                pointToLayer: function(feature, latlng){
-                    return L.marker(latlng);
-                },
-
-                onEachFeature: function(feature, layer){
-                    if(feature.properties.name){
-                        layer.bindPopup(feature.properties.name);
-                    }
-                }
-
-            }).addTo(map);
-
-            kmlLayers.push(layer);
-
-            map.fitBounds(layer.getBounds());
-
-        };
-
-        reader.readAsText(file);
-    }
+loadStreetView(e.latlng.lat,e.latlng.lng);
 
 });
+
+function loadStreetView(lat,lon){
+
+document.getElementById("streetview").innerHTML=
+'<iframe width="100%" height="300" src="https://maps.google.com/maps?q='+
+lat+','+lon+
+'&layer=c&cbll='+
+lat+','+lon+
+'&cbp=11,0,0,0,0&output=svembed"></iframe>';
+
+}
+
+// KML upload
+document.getElementById('kmlFile').addEventListener('change',function(e){
+
+for(let file of e.target.files){
+
+var reader=new FileReader();
+
+reader.onload=function(event){
+
+var parser=new DOMParser();
+
+var kml=parser.parseFromString(
+event.target.result,
+"text/xml"
+);
+
+var geojson=toGeoJSON.kml(kml);
+
+L.geoJSON(geojson,{
+style:{color:"red"}
+}).addTo(map);
+
+};
+
+reader.readAsText(file);
+
+}
+
+});
+
+function savePOI(){
+
+var data=new FormData();
+
+data.append("poi_name",
+document.getElementById("poi_name").value);
+
+data.append("category",
+document.getElementById("category").value);
+
+data.append("sub_cat",
+document.getElementById("sub_cat").value);
+
+data.append("mobile",
+document.getElementById("mobile").value);
+
+data.append("display_lat",
+document.getElementById("display_lat").value);
+
+data.append("display_lon",
+document.getElementById("display_lon").value);
+
+data.append("build_lat",
+document.getElementById("build_lat").value);
+
+data.append("build_lon",
+document.getElementById("build_lon").value);
+
+fetch("save.php",{
+method:"POST",
+body:data
+})
+.then(res=>res.text())
+.then(alert);
+
+}
 
 </script>
 
