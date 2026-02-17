@@ -31,6 +31,39 @@ Upload KML:
 
 <button onclick="setBuildMode()">Building Location</button>
 
+<div id="form-container">
+    <h3>POI Details</h3>
+
+    <label>Name:</label>
+    <input type="text" id="poiName">
+
+    <label>Category:</label>
+    <select id="poiCategory">
+        <option value="">Select Category</option>
+        <option value="Building">Building</option>
+        <option value="Pole">Pole</option>
+        <option value="Transformer">Transformer</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <label>Sub Category:</label>
+    <input type="text" id="poiSubCategory">
+
+    <label>Display Lat:</label>
+    <input type="text" id="displayLat" readonly>
+
+    <label>Display Lng:</label>
+    <input type="text" id="displayLng" readonly>
+
+    <label>Building Lat:</label>
+    <input type="text" id="buildingLat" readonly>
+
+    <label>Building Lng:</label>
+    <input type="text" id="buildingLng" readonly>
+
+    <button onclick="savePOI()">Save POI</button>
+</div>
+
 </div>
 
 
@@ -64,3 +97,5 @@ Building Lon:
 
 </body>
 </html>
+
+

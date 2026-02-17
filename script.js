@@ -157,3 +157,79 @@ reader.readAsText(file);
 }
 
 });
+
+let markers = [];
+
+function addMarker(lat, lng, type) {
+
+    let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+    marker.on("contextmenu", function () {
+
+        if(confirm("Delete this point?")) {
+
+            map.removeLayer(marker);
+
+            markers = markers.filter(m => m !== marker);
+        }
+    });
+
+    markers.push(marker);
+}
+
+let mode = "";
+
+function setDisplayMode() {
+    mode = "display";
+}
+
+function setBuildMode() {
+    mode = "building";
+}
+
+map.on("click", function(e) {
+
+    if(mode === "display") {
+
+        document.getElementById("displayLat").value = e.latlng.lat;
+        document.getElementById("displayLng").value = e.latlng.lng;
+
+        addMarker(e.latlng.lat, e.latlng.lng);
+
+    }
+
+    if(mode === "building") {
+
+        document.getElementById("buildingLat").value = e.latlng.lat;
+        document.getElementById("buildingLng").value = e.latlng.lng;
+
+        addMarker(e.latlng.lat, e.latlng.lng);
+
+    }
+
+});
+
+function savePOI() {
+
+    let data = {
+
+        name: document.getElementById("poiName").value,
+
+        category: document.getElementById("poiCategory").value,
+
+        subcategory: document.getElementById("poiSubCategory").value,
+
+        displayLat: document.getElementById("displayLat").value,
+
+        displayLng: document.getElementById("displayLng").value,
+
+        buildingLat: document.getElementById("buildingLat").value,
+
+        buildingLng: document.getElementById("buildingLng").value
+    };
+
+    console.log(data);
+
+    alert("POI saved successfully");
+}
+
