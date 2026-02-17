@@ -1,51 +1,97 @@
 let map;
 let streetView;
-let displayMode = false;
-let buildingMode = false;
-let pois = [];
+let displayMode=false;
+let buildingMode=false;
+let pois=[];
+
+let leafletMap;
+let kmlLayers=[];
 
 function initMap()
 {
-    const center = {lat:31.6340,lng:74.8723};
+const center={lat:31.6340,lng:74.8723};
 
-    map = new google.maps.Map(document.getElementById("map"),
-    {
-        zoom:13,
-        center:center
-    });
+map=new google.maps.Map(document.getElementById("map"),
+{
+zoom:13,
+center:center,
+mapTypeId:"roadmap"
+});
 
-    streetView = new google.maps.StreetViewPanorama(
-        document.getElementById("streetview"),
-        {
-            position:center,
-            pov:{heading:0,pitch:0},
-            zoom:1
-        }
-    );
+streetView=new google.maps.StreetViewPanorama(
+document.getElementById("streetview"),
+{
+position:center,
+pov:{heading:0,pitch:0},
+zoom:1
+});
 
-    map.setStreetView(streetView);
+map.setStreetView(streetView);
 
-    map.addListener("click", function(e)
-    {
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
+map.addListener("click",function(e)
+{
+const lat=e.latLng.lat();
+const lng=e.latLng.lng();
 
-        streetView.setPosition({lat,lng});
+streetView.setPosition({lat,lng});
 
-        if(displayMode)
-        {
-            document.getElementById("displayLat").value = lat;
-            document.getElementById("displayLng").value = lng;
-        }
+if(displayMode)
+{
+document.getElementById("displayLat").value=lat;
+document.getElementById("displayLng").value=lng;
+}
 
-        if(buildingMode)
-        {
-            document.getElementById("buildingLat").value = lat;
-            document.getElementById("buildingLng").value = lng;
-        }
-    });
+if(buildingMode)
+{
+document.getElementById("buildingLat").value=lat;
+document.getElementById("buildingLng").value=lng;
+}
+});
 
-    loadKML();
+// initialize Leaflet overlay
+initLeafletOverlay();
+
+loadKML();
+}
+
+function initLeafletOverlay()
+{
+leafletMap=L.map('map',{zoomControl:false,attributionControl:false});
+leafletMap.setView([31.6340,74.8723],13);
+
+L.tileLayer('',{}).addTo(leafletMap);
+}
+
+function loadKML()
+{
+document.getElementById("kmlFile").addEventListener("change",function(e)
+{
+for(let file of e.target.files)
+{
+let reader=new FileReader();
+
+reader.onload=function(event)
+{
+let kmlLayer=omnivore.kml.parse(event.target.result);
+
+kmlLayer.setStyle({
+color:"red",
+weight:4,
+opacity:1,
+fillColor:"yellow",
+fillOpacity:0.5
+});
+
+kmlLayer.addTo(leafletMap);
+
+kmlLayers.push(kmlLayer);
+
+leafletMap.fitBounds(kmlLayer.getBounds());
+};
+
+reader.readAsText(file);
+}
+});
 }
 
 function setDisplayMode()
@@ -60,43 +106,17 @@ displayMode=false;
 buildingMode=true;
 }
 
-function loadKML()
-{
-document.getElementById("kmlFile").addEventListener("change",function(e)
-{
-    for(let file of e.target.files)
-    {
-        let reader = new FileReader();
-
-        reader.onload=function(event)
-        {
-            let parser = new DOMParser();
-            let xml = parser.parseFromString(event.target.result,"text/xml");
-
-            let kmlLayer = new google.maps.KmlLayer({
-                url: URL.createObjectURL(file),
-                map: map
-            });
-        }
-
-        reader.readAsText(file);
-    }
-});
-}
-
 function savePOI()
 {
-let name=document.getElementById("name").value;
-let category=document.getElementById("category").value;
-let sub=document.getElementById("subcategory").value;
-
-let dlat=document.getElementById("displayLat").value;
-let dlng=document.getElementById("displayLng").value;
-
-let blat=document.getElementById("buildingLat").value;
-let blng=document.getElementById("buildingLng").value;
-
-let poi={name,category,sub,dlat,dlng,blat,blng};
+let poi={
+name:name.value,
+category:category.value,
+subcategory:subcategory.value,
+displayLat:displayLat.value,
+displayLng:displayLng.value,
+buildingLat:buildingLat.value,
+buildingLng:buildingLng.value
+};
 
 pois.push(poi);
 
@@ -107,8 +127,7 @@ function updateTable()
 {
 let table=document.getElementById("poiTable");
 
-table.innerHTML=
-`
+table.innerHTML=`
 <tr>
 <th>Name</th>
 <th>Category</th>
@@ -127,14 +146,14 @@ let row=table.insertRow();
 
 row.insertCell(0).innerText=poi.name;
 row.insertCell(1).innerText=poi.category;
-row.insertCell(2).innerText=poi.sub;
-row.insertCell(3).innerText=poi.dlat;
-row.insertCell(4).innerText=poi.dlng;
-row.insertCell(5).innerText=poi.blat;
-row.insertCell(6).innerText=poi.blng;
+row.insertCell(2).innerText=poi.subcategory;
+row.insertCell(3).innerText=poi.displayLat;
+row.insertCell(4).innerText=poi.displayLng;
+row.insertCell(5).innerText=poi.buildingLat;
+row.insertCell(6).innerText=poi.buildingLng;
 
 let del=row.insertCell(7);
-del.innerHTML="<button onclick='deletePOI("+index+")'>Delete</button>";
+del.innerHTML=`<button onclick="deletePOI(${index})">Delete</button>`;
 });
 }
 
