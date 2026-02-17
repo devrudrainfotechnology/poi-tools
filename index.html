@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
 <title>POI Collection Tool</title>
 
-<meta charset="utf-8"/>
+<meta charset="utf-8">
 
-<link rel="stylesheet" href="style.css"/>
-
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/togeojson@0.16.0/dist/togeojson.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_API_KEY"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
+
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -22,52 +22,21 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <h2>POI Collection Tool</h2>
 
-<div class="topbar">
+<div class="toolbar">
 
-Upload KML:
-<input type="file" id="kmlFile" multiple accept=".kml">
+<input type="file" id="kmlUpload" multiple>
 
 <button onclick="setDisplayMode()">Display Location</button>
 
-<button onclick="setBuildMode()">Building Location</button>
+<button onclick="setBuildingMode()">Building Location</button>
 
-<div id="form-container">
-    <h3>POI Details</h3>
+<button onclick="exportCSV()">Export CSV</button>
 
-    <label>Name:</label>
-    <input type="text" id="poiName">
-
-    <label>Category:</label>
-    <select id="poiCategory">
-        <option value="">Select Category</option>
-        <option value="Building">Building</option>
-        <option value="Pole">Pole</option>
-        <option value="Transformer">Transformer</option>
-        <option value="Other">Other</option>
-    </select>
-
-    <label>Sub Category:</label>
-    <input type="text" id="poiSubCategory">
-
-    <label>Display Lat:</label>
-    <input type="text" id="displayLat" readonly>
-
-    <label>Display Lng:</label>
-    <input type="text" id="displayLng" readonly>
-
-    <label>Building Lat:</label>
-    <input type="text" id="buildingLat" readonly>
-
-    <label>Building Lng:</label>
-    <input type="text" id="buildingLng" readonly>
-
-    <button onclick="savePOI()">Save POI</button>
-</div>
+<button onclick="exportKML()">Export KML</button>
 
 </div>
 
-
-<div class="main">
+<div class="container">
 
 <div id="streetview"></div>
 
@@ -75,27 +44,38 @@ Upload KML:
 
 </div>
 
+<div class="form">
 
-<div class="tools">
+<h3>POI Details</h3>
 
-Display Lat:
-<input id="display_lat" readonly>
+Name  
+<input type="text" id="name">
 
-Display Lon:
-<input id="display_lon" readonly>
+Category  
+<input type="text" id="category">
 
-Building Lat:
-<input id="build_lat" readonly>
+Sub Category  
+<input type="text" id="subcategory">
 
-Building Lon:
-<input id="build_lon" readonly>
+Display Lat  
+<input type="text" id="displayLat">
+
+Display Lng  
+<input type="text" id="displayLng">
+
+Building Lat  
+<input type="text" id="buildingLat">
+
+Building Lng  
+<input type="text" id="buildingLng">
+
+<button onclick="savePOI()">Save</button>
 
 </div>
 
-
 <script src="script.js"></script>
+
+<script src="export.js"></script>
 
 </body>
 </html>
-
-

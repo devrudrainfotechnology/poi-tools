@@ -1,152 +1,118 @@
+let map = L.map('map').setView([31.6340, 74.8723], 13);
 
-var map = L.map('map').setView([31.6340,74.8723],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+.addTo(map);
 
-L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+let panorama = new google.maps.StreetViewPanorama(
+document.getElementById("streetview"),
 {
-maxZoom:22
-}).addTo(map);
+position:{lat:31.6340,lng:74.8723},
+pov:{heading:0,pitch:0},
+zoom:1
+});
 
+let mode = "";
 
-var displayMarker=null;
-var buildMarker=null;
+let markers = [];
 
-var mode=null;
+let poiData = [];
 
-
-
-// MODE SELECT
-
-function setDisplayMode(){
-
+function setDisplayMode()
+{
 mode="display";
+alert("Click map to set DISPLAY location");
+}
 
-alert("Click display location on map");
+function setBuildingMode()
+{
+mode="building";
+alert("Click map to set BUILDING location");
+}
+
+map.on("click",function(e)
+{
+
+if(mode==="display")
+{
+document.getElementById("displayLat").value=e.latlng.lat;
+document.getElementById("displayLng").value=e.latlng.lng;
+
+panorama.setPosition({
+lat:e.latlng.lat,
+lng:e.latlng.lng
+});
+
+addMarker(e.latlng,"display");
 
 }
 
-function setBuildMode(){
+if(mode==="building")
+{
+document.getElementById("buildingLat").value=e.latlng.lat;
+document.getElementById("buildingLng").value=e.latlng.lng;
 
-mode="build";
-
-alert("Click building location on map");
-
-}
-
-
-
-// MAP CLICK
-
-map.on('click',function(e){
-
-var lat=e.latlng.lat;
-var lon=e.latlng.lng;
-
-
-if(mode=="display"){
-
-if(displayMarker)
-map.removeLayer(displayMarker);
-
-displayMarker=L.marker(e.latlng,{
-icon:L.icon({
-iconUrl:"https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-iconSize:[32,32]
-})
-}).addTo(map);
-
-document.getElementById("display_lat").value=lat;
-document.getElementById("display_lon").value=lon;
-
-loadStreetView(lat,lon);
-
-}
-
-
-if(mode=="build"){
-
-if(buildMarker)
-map.removeLayer(buildMarker);
-
-buildMarker=L.marker(e.latlng,{
-icon:L.icon({
-iconUrl:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-iconSize:[32,32]
-})
-}).addTo(map);
-
-document.getElementById("build_lat").value=lat;
-document.getElementById("build_lon").value=lon;
+addMarker(e.latlng,"building");
 
 }
 
 });
 
+function addMarker(latlng,type)
+{
 
+let marker=L.marker(latlng,{draggable:true}).addTo(map);
 
-// STREET VIEW LOAD
+marker.on("dragend",function(e)
+{
 
-function loadStreetView(lat,lon){
+let pos=e.target.getLatLng();
 
-document.getElementById("streetview").innerHTML=
-
-'<iframe width="100%" height="100%" frameborder="0" '+
-
-'src="https://www.google.com/maps?q=&layer=c&cbll='+
-
-lat+','+lon+
-
-'&cbp=11,0,0,0,0&output=svembed">'+
-
-'</iframe>';
-
+if(type==="display")
+{
+document.getElementById("displayLat").value=pos.lat;
+document.getElementById("displayLng").value=pos.lng;
 }
 
+if(type==="building")
+{
+document.getElementById("buildingLat").value=pos.lat;
+document.getElementById("buildingLng").value=pos.lng;
+}
 
-
-// KML LOAD WITH STRONG HIGHLIGHT
-
-document.getElementById('kmlFile')
-.addEventListener('change',function(e){
-
-for(let file of e.target.files){
-
-var reader=new FileReader();
-
-reader.onload=function(event){
-
-var parser=new DOMParser();
-
-var kml=parser.parseFromString(
-event.target.result,
-"text/xml"
-);
-
-var geojson=toGeoJSON.kml(kml);
-
-
-var layer=L.geoJSON(geojson,{
-
-style:{
-color:"#000000",
-weight:5,
-fillColor:"#ff0000",
-fillOpacity:0.2
-},
-
-pointToLayer:function(feature,latlng){
-
-return L.circleMarker(latlng,{
-radius:7,
-color:"#000000",
-fillColor:"#ff0000",
-fillOpacity:1
 });
 
+marker.on("contextmenu",function()
+{
+
+if(confirm("Delete marker?"))
+{
+map.removeLayer(marker);
 }
 
-}).addTo(map);
+});
 
+markers.push(marker);
+
+}
+
+document.getElementById("kmlUpload")
+.addEventListener("change",function(e)
+{
+
+for(let file of e.target.files)
+{
+
+let reader=new FileReader();
+
+reader.onload=function(x)
+{
+
+let kml=new DOMParser()
+.parseFromString(x.target.result,"text/xml");
+
+let layer=new L.KML(kml);
+
+map.addLayer(layer);
 
 map.fitBounds(layer.getBounds());
 
@@ -158,78 +124,24 @@ reader.readAsText(file);
 
 });
 
-let markers = [];
+function savePOI()
+{
 
-function addMarker(lat, lng, type) {
+let obj=
+{
 
-    let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+name:document.getElementById("name").value,
+category:document.getElementById("category").value,
+subcategory:document.getElementById("subcategory").value,
+displayLat:document.getElementById("displayLat").value,
+displayLng:document.getElementById("displayLng").value,
+buildingLat:document.getElementById("buildingLat").value,
+buildingLng:document.getElementById("buildingLng").value
 
-    marker.on("contextmenu", function () {
+};
 
-        if(confirm("Delete this point?")) {
+poiData.push(obj);
 
-            map.removeLayer(marker);
+alert("Saved");
 
-            markers = markers.filter(m => m !== marker);
-        }
-    });
-
-    markers.push(marker);
 }
-
-let mode = "";
-
-function setDisplayMode() {
-    mode = "display";
-}
-
-function setBuildMode() {
-    mode = "building";
-}
-
-map.on("click", function(e) {
-
-    if(mode === "display") {
-
-        document.getElementById("displayLat").value = e.latlng.lat;
-        document.getElementById("displayLng").value = e.latlng.lng;
-
-        addMarker(e.latlng.lat, e.latlng.lng);
-
-    }
-
-    if(mode === "building") {
-
-        document.getElementById("buildingLat").value = e.latlng.lat;
-        document.getElementById("buildingLng").value = e.latlng.lng;
-
-        addMarker(e.latlng.lat, e.latlng.lng);
-
-    }
-
-});
-
-function savePOI() {
-
-    let data = {
-
-        name: document.getElementById("poiName").value,
-
-        category: document.getElementById("poiCategory").value,
-
-        subcategory: document.getElementById("poiSubCategory").value,
-
-        displayLat: document.getElementById("displayLat").value,
-
-        displayLng: document.getElementById("displayLng").value,
-
-        buildingLat: document.getElementById("buildingLat").value,
-
-        buildingLng: document.getElementById("buildingLng").value
-    };
-
-    console.log(data);
-
-    alert("POI saved successfully");
-}
-
