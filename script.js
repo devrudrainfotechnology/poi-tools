@@ -5,25 +5,38 @@ let buildingMode=false;
 let pois=[];
 
 let leafletMap;
-let kmlLayers=[];
+let kmlLayers = [];
 
-function initMap()
-{
-const center={lat:31.6340,lng:74.8723};
+document.getElementById("kmlFile").addEventListener("change", function(e) {
 
-map=new google.maps.Map(document.getElementById("map"),
-{
-zoom:13,
-center:center,
-mapTypeId:"roadmap"
-});
+    const files = e.target.files;
 
-streetView=new google.maps.StreetViewPanorama(
-document.getElementById("streetview"),
-{
-position:center,
-pov:{heading:0,pitch:0},
-zoom:1
+    files.forEach(file => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+
+            const kmlText = event.target.result;
+
+            const parser = new DOMParser();
+            const kmlDoc = parser.parseFromString(kmlText, "text/xml");
+
+            const kmlLayer = new google.maps.KmlLayer({
+                url: URL.createObjectURL(new Blob([kmlText], {type: 'application/vnd.google-earth.kml+xml'})),
+                map: map,
+                preserveViewport: false,
+                suppressInfoWindows: false
+            });
+
+            kmlLayers.push(kmlLayer);
+
+        };
+
+        reader.readAsText(file);
+
+    });
+
 });
 
 map.setStreetView(streetView);
@@ -162,3 +175,4 @@ function deletePOI(index)
 pois.splice(index,1);
 updateTable();
 }
+
