@@ -22,47 +22,40 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <h2>POI Collection Tool</h2>
 
-<div class="toolbar">
+<div class="topbar">
 
 Upload KML:
 <input type="file" id="kmlFile" multiple accept=".kml">
 
-<button onclick="setDisplayMode()">
-Display Location
-</button>
+<button onclick="setDisplayMode()">Display Location</button>
 
-<button onclick="setBuildMode()">
-Building Location
-</button>
+<button onclick="setBuildMode()">Building Location</button>
 
 </div>
 
 
-<div class="container">
-
-<div id="map"></div>
+<div class="main">
 
 <div id="streetview"></div>
 
+<div id="map"></div>
+
 </div>
 
 
-<div class="form">
-
-POI Name:
-<input id="poi_name">
+<div class="tools">
 
 Display Lat:
-<input id="display_lat">
+<input id="display_lat" readonly>
 
 Display Lon:
-<input id="display_lon">
+<input id="display_lon" readonly>
 
 Building Lat:
-<input id="build_lat">
+<input id="build_lat" readonly>
 
 Building Lon:
-<input id="build_lon">
+<input id="build_lon" readonly>
 
 </div>
 

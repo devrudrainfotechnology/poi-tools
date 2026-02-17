@@ -1,6 +1,4 @@
 
-// Initialize map
-
 var map = L.map('map').setView([31.6340,74.8723],13);
 
 L.tileLayer(
@@ -10,20 +8,20 @@ maxZoom:22
 }).addTo(map);
 
 
-var mode=null;
-
 var displayMarker=null;
 var buildMarker=null;
 
+var mode=null;
 
 
-// MODE
+
+// MODE SELECT
 
 function setDisplayMode(){
 
 mode="display";
 
-alert("Click shop display location");
+alert("Click display location on map");
 
 }
 
@@ -31,13 +29,13 @@ function setBuildMode(){
 
 mode="build";
 
-alert("Click building location");
+alert("Click building location on map");
 
 }
 
 
 
-// CLICK EVENT
+// MAP CLICK
 
 map.on('click',function(e){
 
@@ -60,12 +58,9 @@ iconSize:[32,32]
 document.getElementById("display_lat").value=lat;
 document.getElementById("display_lon").value=lon;
 
-// LOAD STREET VIEW
-
 loadStreetView(lat,lon);
 
 }
-
 
 
 if(mode=="build"){
@@ -89,7 +84,7 @@ document.getElementById("build_lon").value=lon;
 
 
 
-// STREET VIEW (with timeline support)
+// STREET VIEW LOAD
 
 function loadStreetView(lat,lon){
 
@@ -97,9 +92,9 @@ document.getElementById("streetview").innerHTML=
 
 '<iframe width="100%" height="100%" frameborder="0" '+
 
-'src="https://www.google.com/maps?q=&layer=c&cbll='
+'src="https://www.google.com/maps?q=&layer=c&cbll='+
 
-+lat+','+lon+
+lat+','+lon+
 
 '&cbp=11,0,0,0,0&output=svembed">'+
 
@@ -109,7 +104,7 @@ document.getElementById("streetview").innerHTML=
 
 
 
-// LOAD KML
+// KML LOAD WITH STRONG HIGHLIGHT
 
 document.getElementById('kmlFile')
 .addEventListener('change',function(e){
@@ -130,34 +125,28 @@ event.target.result,
 var geojson=toGeoJSON.kml(kml);
 
 
-// DARK AOI STYLE
-
 var layer=L.geoJSON(geojson,{
 
 style:{
 color:"#000000",
-weight:4,
+weight:5,
 fillColor:"#ff0000",
-fillOpacity:0.1
+fillOpacity:0.2
 },
 
 pointToLayer:function(feature,latlng){
 
 return L.circleMarker(latlng,{
-
-radius:6,
+radius:7,
 color:"#000000",
 fillColor:"#ff0000",
 fillOpacity:1
-
 });
 
 }
 
 }).addTo(map);
 
-
-// ZOOM TO AOI
 
 map.fitBounds(layer.getBounds());
 
