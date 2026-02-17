@@ -1,71 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>POI Collection Tool - Rudra Geotech</title>
+.container
+{
+display:flex;
+height:500px;
+}
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+#streetview
+{
+flex:1;
+}
 
-<link rel="stylesheet" href="style.css">
-
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs"></script>
-
-<script src="https://unpkg.com/@tmcw/togeojson@0.16.0/dist/togeojson.umd.js"></script>
-
-</head>
-
-<body>
-
-<h2>POI Collection Tool</h2>
-
-<div class="toolbar">
-
-<input type="file" id="kmlFile" multiple accept=".kml">
-
-<button onclick="setDisplayMode()">Display Location</button>
-<button onclick="setBuildingMode()">Building Location</button>
-<button onclick="deleteLast()">Delete Last Point</button>
-
-<button onclick="exportCSV()">Export Excel</button>
-<button onclick="exportKML()">Export KML</button>
-
-</div>
-
-<div class="container">
-
-<div id="streetview"></div>
-
-<div id="map"></div>
-
-</div>
-
-<div class="form">
-
-<h3>POI Details</h3>
-
-<input id="poi_name" placeholder="POI Name">
-
-<input id="category" placeholder="Category">
-
-<input id="subcat" placeholder="Sub Category">
-
-<input id="landline" placeholder="Landline">
-
-<input id="mobile" placeholder="Mobile">
-
-<input id="mobile2" placeholder="Mobile 2">
-
-<input id="display_lat" placeholder="Display Lat" readonly>
-<input id="display_lng" placeholder="Display Lng" readonly>
-
-<input id="build_lat" placeholder="Build Lat" readonly>
-<input id="build_lng" placeholder="Build Lng" readonly>
-
-<button onclick="savePOI()">Save POI</button>
-
-</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+#map
+{
+flex:1;
+}
