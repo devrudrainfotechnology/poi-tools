@@ -1,98 +1,186 @@
-var map = L.map('map').setView([31.1471, 75.3412], 8);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-attribution: '© OpenStreetMap'
+var map = L.map('map').setView([31.6340,74.8723],13);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+maxZoom:19
 }).addTo(map);
 
 
-// YOUR GITHUB USERNAME HERE
-var base =
-"https://devrudrainfotechnology.github.io/poi-tool/KML/";
+var mode = null;
 
+var displayMarker = null;
 
-var kmlFiles = [
-
-"11.kml",
-"12.kml",
-"13.kml",
-"14.kml",
-"15.kml",
-"16.kml",
-"17.kml",
-"18.kml",
-"19.kml",
-
-"110.kml",
-"111.kml",
-"112.kml",
-"113.kml",
-"114.kml",
-"115.kml",
-"116.kml",
-"117.kml",
-"118.kml",
-"119.kml",
-
-"120.kml",
-"121.kml",
-"122.kml",
-"123.kml",
-"124.kml",
-"125.kml",
-"126.kml",
-"127.kml",
-"128.kml",
-"129.kml",
-"130.kml",
-"131.kml",
-
-"Grid.kml",
-"Punjab.kml"
-
-];
+var buildMarker = null;
 
 
 
-kmlFiles.forEach(function(file){
+// MODE FUNCTIONS
 
-fetch(base + file)
-.then(res => res.text())
-.then(kmltext => {
+function setDisplayMode(){
+
+mode = "display";
+
+alert("Click on map to select DISPLAY location");
+
+}
+
+function setBuildMode(){
+
+mode = "build";
+
+alert("Click on map to select BUILDING location");
+
+}
+
+
+
+// MAP CLICK EVENT
+
+map.on('click',function(e){
+
+if(mode=="display"){
+
+if(displayMarker)
+map.removeLayer(displayMarker);
+
+displayMarker = L.marker(e.latlng,{
+icon:L.icon({
+iconUrl:
+"https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+iconSize:[32,32]
+})
+}).addTo(map);
+
+document.getElementById("display_lat").value =
+e.latlng.lat;
+
+document.getElementById("display_lon").value =
+e.latlng.lng;
+
+loadStreetView(e.latlng.lat,e.latlng.lng);
+
+}
+
+
+if(mode=="build"){
+
+if(buildMarker)
+map.removeLayer(buildMarker);
+
+buildMarker = L.marker(e.latlng,{
+icon:L.icon({
+iconUrl:
+"https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+iconSize:[32,32]
+})
+}).addTo(map);
+
+document.getElementById("build_lat").value =
+e.latlng.lat;
+
+document.getElementById("build_lon").value =
+e.latlng.lng;
+
+}
+
+});
+
+
+
+// STREET VIEW
+
+function loadStreetView(lat,lon){
+
+document.getElementById("streetview").innerHTML =
+'<iframe width="100%" height="300" src="https://maps.google.com/maps?q='
++lat+','+lon+
+'&layer=c&cbll='
++lat+','+lon+
+'&cbp=11,0,0,0,0&output=svembed"></iframe>';
+
+}
+
+
+
+// KML UPLOAD
+
+document.getElementById('kmlFile')
+.addEventListener('change',function(e){
+
+for(let file of e.target.files){
+
+var reader = new FileReader();
+
+reader.onload = function(event){
 
 var parser = new DOMParser();
-var kml = parser.parseFromString(kmltext,"text/xml");
+
+var kml = parser.parseFromString(
+event.target.result,
+"text/xml"
+);
 
 var geojson = toGeoJSON.kml(kml);
 
 var layer = L.geoJSON(geojson,{
-color:'red'
-}).addTo(map);
 
+style:{
+color:"green",
+weight:2,
+fillOpacity:0.2
+},
 
-var checkbox = document.createElement("input");
-checkbox.type = "checkbox";
-checkbox.checked = true;
+pointToLayer:function(feature,latlng){
 
-checkbox.onchange = function(){
-if(this.checked)
-map.addLayer(layer);
-else
-map.removeLayer(layer);
+return L.circleMarker(latlng,{
+radius:5,
+color:"red"
+});
+
+},
+
+onEachFeature:function(feature,layer){
+
+if(feature.properties.name){
+
+layer.bindPopup(
+feature.properties.name
+);
+
 }
 
-var label = document.createElement("label");
-label.appendChild(checkbox);
-label.appendChild(document.createTextNode(" " + file));
+}
 
-document.getElementById("layerList").appendChild(label);
-document.getElementById("layerList").appendChild(document.createElement("br"));
+}).addTo(map);
+
+map.fitBounds(layer.getBounds());
+
+};
+
+reader.readAsText(file);
+
+}
 
 });
 
-});
 
 
-var script = document.createElement('script');
-script.src =
-'https://cdnjs.cloudflare.com/ajax/libs/togeojson/0.16.0/togeojson.min.js';
-document.head.appendChild(script);
+// SAVE FUNCTION (for now local test)
+
+function savePOI(){
+
+alert("POI Saved (connect to save.php later)");
+
+}
+
+
+
+// EXPORT FUNCTION
+
+function exportExcel(){
+
+alert("Connect export.php later");
+
+}
