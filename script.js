@@ -1,147 +1,145 @@
-let map = L.map('map').setView([31.6340, 74.8723], 13);
+let map;
+let streetView;
+let displayMode = false;
+let buildingMode = false;
+let pois = [];
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-.addTo(map);
-
-let panorama = new google.maps.StreetViewPanorama(
-document.getElementById("streetview"),
+function initMap()
 {
-position:{lat:31.6340,lng:74.8723},
-pov:{heading:0,pitch:0},
-zoom:1
-});
+    const center = {lat:31.6340,lng:74.8723};
 
-let mode = "";
+    map = new google.maps.Map(document.getElementById("map"),
+    {
+        zoom:13,
+        center:center
+    });
 
-let markers = [];
+    streetView = new google.maps.StreetViewPanorama(
+        document.getElementById("streetview"),
+        {
+            position:center,
+            pov:{heading:0,pitch:0},
+            zoom:1
+        }
+    );
 
-let poiData = [];
+    map.setStreetView(streetView);
+
+    map.addListener("click", function(e)
+    {
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+
+        streetView.setPosition({lat,lng});
+
+        if(displayMode)
+        {
+            document.getElementById("displayLat").value = lat;
+            document.getElementById("displayLng").value = lng;
+        }
+
+        if(buildingMode)
+        {
+            document.getElementById("buildingLat").value = lat;
+            document.getElementById("buildingLng").value = lng;
+        }
+    });
+
+    loadKML();
+}
 
 function setDisplayMode()
 {
-mode="display";
-alert("Click map to set DISPLAY location");
+displayMode=true;
+buildingMode=false;
 }
 
 function setBuildingMode()
 {
-mode="building";
-alert("Click map to set BUILDING location");
+displayMode=false;
+buildingMode=true;
 }
 
-map.on("click",function(e)
+function loadKML()
 {
-
-if(mode==="display")
+document.getElementById("kmlFile").addEventListener("change",function(e)
 {
-document.getElementById("displayLat").value=e.latlng.lat;
-document.getElementById("displayLng").value=e.latlng.lng;
+    for(let file of e.target.files)
+    {
+        let reader = new FileReader();
 
-panorama.setPosition({
-lat:e.latlng.lat,
-lng:e.latlng.lng
+        reader.onload=function(event)
+        {
+            let parser = new DOMParser();
+            let xml = parser.parseFromString(event.target.result,"text/xml");
+
+            let kmlLayer = new google.maps.KmlLayer({
+                url: URL.createObjectURL(file),
+                map: map
+            });
+        }
+
+        reader.readAsText(file);
+    }
 });
-
-addMarker(e.latlng,"display");
-
 }
-
-if(mode==="building")
-{
-document.getElementById("buildingLat").value=e.latlng.lat;
-document.getElementById("buildingLng").value=e.latlng.lng;
-
-addMarker(e.latlng,"building");
-
-}
-
-});
-
-function addMarker(latlng,type)
-{
-
-let marker=L.marker(latlng,{draggable:true}).addTo(map);
-
-marker.on("dragend",function(e)
-{
-
-let pos=e.target.getLatLng();
-
-if(type==="display")
-{
-document.getElementById("displayLat").value=pos.lat;
-document.getElementById("displayLng").value=pos.lng;
-}
-
-if(type==="building")
-{
-document.getElementById("buildingLat").value=pos.lat;
-document.getElementById("buildingLng").value=pos.lng;
-}
-
-});
-
-marker.on("contextmenu",function()
-{
-
-if(confirm("Delete marker?"))
-{
-map.removeLayer(marker);
-}
-
-});
-
-markers.push(marker);
-
-}
-
-document.getElementById("kmlUpload")
-.addEventListener("change",function(e)
-{
-
-for(let file of e.target.files)
-{
-
-let reader=new FileReader();
-
-reader.onload=function(x)
-{
-
-let kml=new DOMParser()
-.parseFromString(x.target.result,"text/xml");
-
-let layer=new L.KML(kml);
-
-map.addLayer(layer);
-
-map.fitBounds(layer.getBounds());
-
-};
-
-reader.readAsText(file);
-
-}
-
-});
 
 function savePOI()
 {
+let name=document.getElementById("name").value;
+let category=document.getElementById("category").value;
+let sub=document.getElementById("subcategory").value;
 
-let obj=
+let dlat=document.getElementById("displayLat").value;
+let dlng=document.getElementById("displayLng").value;
+
+let blat=document.getElementById("buildingLat").value;
+let blng=document.getElementById("buildingLng").value;
+
+let poi={name,category,sub,dlat,dlng,blat,blng};
+
+pois.push(poi);
+
+updateTable();
+}
+
+function updateTable()
 {
+let table=document.getElementById("poiTable");
 
-name:document.getElementById("name").value,
-category:document.getElementById("category").value,
-subcategory:document.getElementById("subcategory").value,
-displayLat:document.getElementById("displayLat").value,
-displayLng:document.getElementById("displayLng").value,
-buildingLat:document.getElementById("buildingLat").value,
-buildingLng:document.getElementById("buildingLng").value
+table.innerHTML=
+`
+<tr>
+<th>Name</th>
+<th>Category</th>
+<th>SubCategory</th>
+<th>Display Lat</th>
+<th>Display Lng</th>
+<th>Building Lat</th>
+<th>Building Lng</th>
+<th>Delete</th>
+</tr>
+`;
 
-};
+pois.forEach((poi,index)=>
+{
+let row=table.insertRow();
 
-poiData.push(obj);
+row.insertCell(0).innerText=poi.name;
+row.insertCell(1).innerText=poi.category;
+row.insertCell(2).innerText=poi.sub;
+row.insertCell(3).innerText=poi.dlat;
+row.insertCell(4).innerText=poi.dlng;
+row.insertCell(5).innerText=poi.blat;
+row.insertCell(6).innerText=poi.blng;
 
-alert("Saved");
+let del=row.insertCell(7);
+del.innerHTML="<button onclick='deletePOI("+index+")'>Delete</button>";
+});
+}
 
+function deletePOI(index)
+{
+pois.splice(index,1);
+updateTable();
 }
