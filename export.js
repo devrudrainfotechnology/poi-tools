@@ -84,5 +84,3 @@ function exportCSV() {
 
     a.click();
 }
-
-
