@@ -28,61 +28,41 @@ Upload KML:
 <input type="file" id="kmlFile" multiple accept=".kml">
 
 <button onclick="setDisplayMode()">
-Select Display Location
+Display Location
 </button>
 
 <button onclick="setBuildMode()">
-Select Building Location
+Building Location
 </button>
 
 </div>
 
 
-<div id="map"></div>
+<div class="container">
 
+<div id="map"></div>
 
 <div id="streetview"></div>
 
+</div>
 
-<div id="form">
 
-<h3>POI Details</h3>
+<div class="form">
 
 POI Name:
 <input id="poi_name">
 
-Category:
-<input id="category">
-
-Sub Category:
-<input id="sub_cat">
-
-Mobile:
-<input id="mobile">
-
-<br>
-
 Display Lat:
-<input id="display_lat" readonly>
+<input id="display_lat">
 
 Display Lon:
-<input id="display_lon" readonly>
+<input id="display_lon">
 
 Building Lat:
-<input id="build_lat" readonly>
+<input id="build_lat">
 
 Building Lon:
-<input id="build_lon" readonly>
-
-<br>
-
-<button onclick="savePOI()">
-Save
-</button>
-
-<button onclick="exportExcel()">
-Export Excel
-</button>
+<input id="build_lon">
 
 </div>
 
