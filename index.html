@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <title>POI Collection Tool</title>
 
 <meta charset="utf-8">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&libraries=places"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="style.css">
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+
+<!-- GOOGLE MAPS API (FIXED VERSION) -->
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&libraries=places&callback=initMap">
+</script>
 
 </head>
 
@@ -22,19 +24,12 @@
 
 <h2>POI Collection Tool</h2>
 
-<div class="toolbar">
-
-<input type="file" id="kmlUpload" multiple>
+<input type="file" id="kmlFile" multiple>
 
 <button onclick="setDisplayMode()">Display Location</button>
-
 <button onclick="setBuildingMode()">Building Location</button>
-
 <button onclick="exportCSV()">Export CSV</button>
-
 <button onclick="exportKML()">Export KML</button>
-
-</div>
 
 <div class="container">
 
@@ -44,12 +39,9 @@
 
 </div>
 
-<div class="form">
-
 <h3>Saved POIs</h3>
 
-<table border="1">
-<thead>
+<table border="1" id="poiTable">
 <tr>
 <th>Name</th>
 <th>Category</th>
@@ -60,45 +52,24 @@
 <th>Building Lng</th>
 <th>Delete</th>
 </tr>
-</thead>
-
-<tbody id="poiTableBody"></tbody>
-
 </table>
-
 
 <h3>POI Details</h3>
 
-Name  
-<input type="text" id="name">
+Name <input id="name">
+Category <input id="category">
+Sub Category <input id="subcategory">
 
-Category  
-<input type="text" id="category">
+Display Lat <input id="displayLat">
+Display Lng <input id="displayLng">
 
-Sub Category  
-<input type="text" id="subcategory">
-
-Display Lat  
-<input type="text" id="displayLat">
-
-Display Lng  
-<input type="text" id="displayLng">
-
-Building Lat  
-<input type="text" id="buildingLat">
-
-Building Lng  
-<input type="text" id="buildingLng">
+Building Lat <input id="buildingLat">
+Building Lng <input id="buildingLng">
 
 <button onclick="savePOI()">Save</button>
 
-</div>
-
 <script src="script.js"></script>
-
 <script src="export.js"></script>
 
 </body>
 </html>
-
-
