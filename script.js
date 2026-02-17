@@ -53,20 +53,36 @@ function initMap()
 
 
 // LOAD MULTIPLE KML FILES CORRECTLY
-function loadKML(e)
+let geoXml;
+
+document.getElementById("kmlFile").addEventListener("change", function(e)
 {
     const files = e.target.files;
 
-    for(let file of files)
+    for (let file of files)
     {
-        const url = URL.createObjectURL(file);
+        const reader = new FileReader();
 
-        const kmlLayer = new google.maps.KmlLayer({
-            url: url,
-            map: map,
-            preserveViewport: false,
-            suppressInfoWindows: false
-        });
+        reader.onload = function(event)
+        {
+            const kmlText = event.target.result;
+
+            const parser = new geoXML3.parser({
+                map: map,
+                zoom: true,
+                singleInfoWindow: true,
+                afterParse: function(doc)
+                {
+                    console.log("KML Loaded correctly");
+                }
+            });
+
+            parser.parseKmlString(kmlText);
+        };
+
+        reader.readAsText(file);
+    }
+});
 
         // AUTO ZOOM TO KML
         google.maps.event.addListenerOnce(kmlLayer, "defaultviewport_changed", function()
@@ -210,3 +226,4 @@ function exportKML()
 
     link.click();
 }
+
