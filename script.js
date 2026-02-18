@@ -2,16 +2,18 @@ let map;
 let streetView;
 let geoParser;
 
-let displayMode = false;
-let buildingMode = false;
+let displayMode=false;
+let buildingMode=false;
 
-let pois = [];
+let pois=[];
 
+
+// INIT MAP
 function initMap()
 {
-    const center = { lat:31.1471, lng:75.3412 };
+    const center={lat:31.1471,lng:75.3412};
 
-    map = new google.maps.Map(
+    map=new google.maps.Map(
         document.getElementById("map"),
         {
             center:center,
@@ -19,7 +21,7 @@ function initMap()
         }
     );
 
-    streetView = new google.maps.StreetViewPanorama(
+    streetView=new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
         {
             position:center,
@@ -30,65 +32,66 @@ function initMap()
 
     map.setStreetView(streetView);
 
-    geoParser = new geoXML3.parser({
-        map: map,
-        zoom: true
+    geoParser=new geoXML3.parser({
+        map:map,
+        zoom:true
     });
 
-    map.addListener("click", function(event)
+    map.addListener("click",function(event)
     {
         handleClick(event.latLng);
     });
 
-    map.data.addListener("click", function(event)
+    map.data.addListener("click",function(event)
     {
         handleClick(event.latLng);
     });
 
     document.getElementById("fileInput")
-        .addEventListener("change", loadFiles);
+    .addEventListener("change",loadFiles);
 }
 
+
+// CLICK HANDLER
 function handleClick(latLng)
 {
-    const lat = latLng.lat();
-    const lng = latLng.lng();
+    const lat=latLng.lat();
+    const lng=latLng.lng();
 
     streetView.setPosition({lat,lng});
 
     if(displayMode)
     {
-        document.getElementById("displayLat").value = lat;
-        document.getElementById("displayLng").value = lng;
+        displayLat.value=lat;
+        displayLng.value=lng;
     }
 
     if(buildingMode)
     {
-        document.getElementById("buildingLat").value = lat;
-        document.getElementById("buildingLng").value = lng;
+        buildingLat.value=lat;
+        buildingLng.value=lng;
     }
 }
 
+
+// LOAD FILES
 function loadFiles(event)
 {
-    const files = event.target.files;
+    const files=event.target.files;
 
     for(let file of files)
     {
-        const reader = new FileReader();
+        const reader=new FileReader();
 
-        reader.onload = function(e)
+        reader.onload=function(e)
         {
-            const content = e.target.result;
-
-            if(file.name.toLowerCase().endsWith(".kml"))
+            if(file.name.endsWith(".kml"))
             {
-                geoParser.parseKmlString(content);
+                geoParser.parseKmlString(e.target.result);
             }
-            else if(file.name.toLowerCase().endsWith(".geojson")
-                 || file.name.toLowerCase().endsWith(".json"))
+            else
             {
-                const geojson = JSON.parse(content);
+                const geojson=JSON.parse(e.target.result);
 
                 map.data.addGeoJson(geojson);
 
@@ -96,7 +99,6 @@ function loadFiles(event)
                     clickable:true,
                     strokeColor:"#FF0000",
                     strokeWeight:2,
-                    fillColor:"#FF0000",
                     fillOpacity:0.1
                 });
             }
@@ -106,22 +108,31 @@ function loadFiles(event)
     }
 }
 
+
+// MODE
 function setDisplayMode()
 {
-    displayMode = true;
-    buildingMode = false;
+    displayMode=true;
+    buildingMode=false;
 }
 
 function setBuildingMode()
 {
-    displayMode = false;
-    buildingMode = true;
+    displayMode=false;
+    buildingMode=true;
 }
 
+
+// SAVE POI
 function savePOI()
 {
-    const poi =
-    {
+    const poi={
+        name:poi_name.value,
+        category:category.value,
+        subcat:subcat.value,
+        landline:landline.value,
+        mobile:mobile.value,
+        mobile1:mobile1.value,
         displayLat:displayLat.value,
         displayLng:displayLng.value,
         buildingLat:buildingLat.value,
@@ -133,29 +144,41 @@ function savePOI()
     updateTable();
 }
 
+
+// UPDATE TABLE
 function updateTable()
 {
-    let html =
-    `
-    <tr>
-    <th>Display Lat</th>
-    <th>Display Lng</th>
-    <th>Building Lat</th>
-    <th>Building Lng</th>
-    </tr>
-    `;
+    let html=`
+<tr>
+<th>Name</th>
+<th>Category</th>
+<th>SubCategory</th>
+<th>Landline</th>
+<th>Mobile</th>
+<th>Mobile1</th>
+<th>DisplayLat</th>
+<th>DisplayLng</th>
+<th>BuildingLat</th>
+<th>BuildingLng</th>
+</tr>
+`;
 
-    pois.forEach(p =>
-    {
-        html += `
-        <tr>
-        <td>${p.displayLat}</td>
-        <td>${p.displayLng}</td>
-        <td>${p.buildingLat}</td>
-        <td>${p.buildingLng}</td>
-        </tr>
-        `;
-    });
+    pois.forEach(p=>{
+html+=`
+<tr>
+<td>${p.name}</td>
+<td>${p.category}</td>
+<td>${p.subcat}</td>
+<td>${p.landline}</td>
+<td>${p.mobile}</td>
+<td>${p.mobile1}</td>
+<td>${p.displayLat}</td>
+<td>${p.displayLng}</td>
+<td>${p.buildingLat}</td>
+<td>${p.buildingLng}</td>
+</tr>
+`;
+});
 
-    poiTable.innerHTML = html;
+poiTable.innerHTML=html;
 }
