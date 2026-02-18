@@ -28,6 +28,9 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 <button onclick="setBuildingMode()">Select Building Location</button>
 <button onclick="savePOI()">Save POI</button>
 
+<button onclick="exportCSV()">Export Excel</button>
+<button onclick="exportKML()">Export KML</button>
+
 <div class="container">
 
 <div id="streetview"></div>
@@ -35,7 +38,7 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 
 </div>
 
-<h3>POI Entry Form</h3>
+<h3>POI Entry</h3>
 
 Name:
 <input id="poi_name">
@@ -43,7 +46,7 @@ Name:
 Category:
 <input id="category">
 
-Sub Category:
+SubCategory:
 <input id="subcat">
 
 Landline:
@@ -52,7 +55,7 @@ Landline:
 Mobile:
 <input id="mobile">
 
-Mobile 1:
+Mobile1:
 <input id="mobile1">
 
 <br><br>
@@ -69,7 +72,7 @@ Building Lat:
 Building Lng:
 <input id="buildingLng">
 
-<h3>Saved POI List</h3>
+<h3>Saved POI</h3>
 
 <table border="1" id="poiTable"></table>
 
