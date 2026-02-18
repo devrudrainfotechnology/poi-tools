@@ -18,6 +18,24 @@
     padding:6px;
     width:180px;
 }
+.container
+{
+    display: flex;
+    height: 500px;
+    margin-top: 10px;
+}
+
+#streetview
+{
+    width: 50%;
+    height: 500px;
+}
+
+#map
+{
+    width: 50%;
+    height: 500px;
+}
 
 .save-section
 {
@@ -40,3 +58,4 @@
 {
     background:#218838;
 }
+
