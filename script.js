@@ -13,13 +13,11 @@ function initMap()
 {
     const center={lat:31.1471,lng:75.3412};
 
-    map=new google.maps.Map(
-        document.getElementById("map"),
-        {
-            center:center,
-            zoom:7
-        }
-    );
+    map=new google.maps.Map(document.getElementById("map"),
+    {
+        center:center,
+        zoom:7
+    });
 
     streetView=new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
@@ -27,32 +25,22 @@ function initMap()
             position:center,
             pov:{heading:0,pitch:0},
             zoom:1
-        }
-    );
+        });
 
     map.setStreetView(streetView);
 
-    geoParser=new geoXML3.parser({
-        map:map,
-        zoom:true
-    });
+    geoParser=new geoXML3.parser({map:map,zoom:true});
 
-    map.addListener("click",function(event)
-    {
-        handleClick(event.latLng);
-    });
+    map.addListener("click",(event)=>handleClick(event.latLng));
 
-    map.data.addListener("click",function(event)
-    {
-        handleClick(event.latLng);
-    });
+    map.data.addListener("click",(event)=>handleClick(event.latLng));
 
     document.getElementById("fileInput")
-    .addEventListener("change",loadFiles);
+        .addEventListener("change",loadFiles);
 }
 
 
-// CLICK HANDLER
+// HANDLE CLICK
 function handleClick(latLng)
 {
     const lat=latLng.lat();
@@ -74,7 +62,7 @@ function handleClick(latLng)
 }
 
 
-// LOAD FILES
+// LOAD KML / GEOJSON
 function loadFiles(event)
 {
     const files=event.target.files;
@@ -86,9 +74,7 @@ function loadFiles(event)
         reader.onload=function(e)
         {
             if(file.name.endsWith(".kml"))
-            {
                 geoParser.parseKmlString(e.target.result);
-            }
             else
             {
                 const geojson=JSON.parse(e.target.result);
@@ -123,7 +109,7 @@ function setBuildingMode()
 }
 
 
-// SAVE POI
+// SAVE
 function savePOI()
 {
     const poi={
@@ -152,7 +138,7 @@ function updateTable()
 <tr>
 <th>Name</th>
 <th>Category</th>
-<th>SubCategory</th>
+<th>SubCat</th>
 <th>Landline</th>
 <th>Mobile</th>
 <th>Mobile1</th>
@@ -160,8 +146,7 @@ function updateTable()
 <th>DisplayLng</th>
 <th>BuildingLat</th>
 <th>BuildingLng</th>
-</tr>
-`;
+</tr>`;
 
     pois.forEach(p=>{
 html+=`
@@ -176,9 +161,58 @@ html+=`
 <td>${p.displayLng}</td>
 <td>${p.buildingLat}</td>
 <td>${p.buildingLng}</td>
-</tr>
-`;
+</tr>`;
 });
 
 poiTable.innerHTML=html;
+}
+
+
+// EXPORT CSV (Excel)
+function exportCSV()
+{
+    let csv=
+"POI_NAME,CATEGORY,SUB_CAT,LANDLINE,MOBILE,MOBILE_1,DISPLAY_LAT,DISPLAY_LNG,BUILD_LAT,BUILD_LNG\n";
+
+    pois.forEach(p=>{
+csv+=`${p.name},${p.category},${p.subcat},${p.landline},${p.mobile},${p.mobile1},${p.displayLat},${p.displayLng},${p.buildingLat},${p.buildingLng}\n`;
+});
+
+    const blob=new Blob([csv],{type:"text/csv"});
+    const link=document.createElement("a");
+
+    link.href=URL.createObjectURL(blob);
+    link.download="POI_Data.csv";
+
+    link.click();
+}
+
+
+// EXPORT KML
+function exportKML()
+{
+    let kml=
+`<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>`;
+
+    pois.forEach(p=>{
+kml+=`
+<Placemark>
+<name>${p.name}</name>
+<Point>
+<coordinates>${p.displayLng},${p.displayLat},0</coordinates>
+</Point>
+</Placemark>`;
+});
+
+kml+=`</Document></kml>`;
+
+    const blob=new Blob([kml],{type:"application/vnd.google-earth.kml+xml"});
+    const link=document.createElement("a");
+
+    link.href=URL.createObjectURL(blob);
+    link.download="POI_Data.kml";
+
+    link.click();
 }
