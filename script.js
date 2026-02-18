@@ -8,22 +8,23 @@ let buildingMode = false;
 let pois = [];
 
 
-// 
-MAP
+// MAIN MAP INIT
 function initMap()
 {
-    map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 7,
-        center: { lat:31.1471, lng:75.3412 }
-    });
+    const center = { lat:31.1471, lng:75.3412 };
 
+    map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom:7,
+            center:center,
+            mapTypeId:"roadmap"
+        }
+    );
+
+    // enable GeoJSON clicking
     map.data.setClickable(true);
 
-    map.addListener("click", function(event)
-    {
-        handleMapClick(event.latLng);
-    });
-}
 
     streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
@@ -35,11 +36,43 @@ function initMap()
     );
 
     map.setStreetView(streetView);
-    
+
+
+    // CLICK HANDLER FOR MAP
+    map.addListener("click", function(event)
+    {
+        handleMapClick(event.latLng);
+    });
+
+
+    // CLICK HANDLER FOR GEOJSON
+    map.data.addListener("click", function(event)
+    {
+        handleMapClick(event.latLng);
+    });
+
+
+    // INIT KML parser
+    geoParser = new geoXML3.parser({
+        map: map,
+        zoom: true
+    });
+
+
+    // FILE LOADER
+    document.getElementById("kmlFile")
+        .addEventListener("change", loadFiles);
+}
+
+
+
+// UNIVERSAL CLICK HANDLER
 function handleMapClick(latLng)
 {
     const lat = latLng.lat();
     const lng = latLng.lng();
+
+    console.log("Clicked:", lat, lng);
 
     streetView.setPosition({ lat, lng });
 
@@ -57,29 +90,8 @@ function handleMapClick(latLng)
 }
 
 
-    // CLICK HANDLER (WORKING FEATURE - DO NOT CHANGE)
-   map.addListener("click", function(event)
-{
-    handleMapClick(event.latLng);
-});
 
-
-
-    // INIT KML parser
-    geoParser = new geoXML3.parser({
-        map: map,
-        zoom: true
-    });
-
-
-    // FILE LOADER (SUPPORTS BOTH KML AND GEOJSON)
-    document.getElementById("kmlFile")
-    .addEventListener("change", loadFiles);
-}
-
-
-
-// LOAD FILES FUNCTION
+// LOAD KML AND GEOJSON
 function loadFiles(event)
 {
     const files = event.target.files;
@@ -92,40 +104,29 @@ function loadFiles(event)
         {
             const content = e.target.result;
 
-            // Detect file type
             if(file.name.toLowerCase().endsWith(".kml"))
             {
-                // Load KML
                 geoParser.parseKmlString(content);
-                console.log("KML loaded:", file.name);
+                console.log("Loaded KML:", file.name);
             }
             else if(file.name.toLowerCase().endsWith(".geojson") ||
                     file.name.toLowerCase().endsWith(".json"))
             {
-                // Load GeoJSON
                 try
                 {
                     const geojson = JSON.parse(content);
 
                     map.data.addGeoJson(geojson);
 
-                    // Allow GeoJSON layer clicks
-map.data.setStyle({
-    clickable: true,
-    strokeColor: "#FF0000",
-    strokeWeight: 2,
-    fillColor: "#FF0000",
-    fillOpacity: 0.1
-});
+                    map.data.setStyle({
+                        clickable:true,
+                        strokeColor:"#FF0000",
+                        strokeWeight:2,
+                        fillColor:"#FF0000",
+                        fillOpacity:0.1
+                    });
 
-// Forward GeoJSON click to lat/lng handler
-map.data.addListener("click", function(event)
-{
-    handleMapClick(event.latLng);
-});
-                    
-
-                    console.log("GeoJSON loaded:", file.name);
+                    console.log("Loaded GeoJSON:", file.name);
                 }
                 catch(err)
                 {
@@ -134,7 +135,7 @@ map.data.addListener("click", function(event)
             }
             else
             {
-                alert("Unsupported file type: " + file.name);
+                alert("Unsupported file type");
             }
         };
 
@@ -142,7 +143,9 @@ map.data.addListener("click", function(event)
     }
 }
 
-// MODE BUTTONS (WORKING FEATURE)
+
+
+// MODE BUTTONS
 function setDisplayMode()
 {
     displayMode = true;
@@ -222,5 +225,3 @@ function deletePOI(index)
     pois.splice(index,1);
     updateTable();
 }
-
-
