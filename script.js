@@ -1,3 +1,16 @@
+window.onload = function()
+{
+    const saved = localStorage.getItem("pois");
+
+    if(saved)
+    {
+        pois = JSON.parse(saved);
+        updateTable();
+    }
+
+    initMap();
+}
+
 let map;
 let streetView;
 let geoParser;
@@ -112,20 +125,20 @@ function setBuildingMode()
 // SAVE
 function savePOI()
 {
-    const poi={
-        name:poi_name.value,
-        category:category.value,
-        subcat:subcat.value,
-        landline:landline.value,
-        mobile:mobile.value,
-        mobile1:mobile1.value,
-        displayLat:displayLat.value,
-        displayLng:displayLng.value,
-        buildingLat:buildingLat.value,
-        buildingLng:buildingLng.value
+    const poi =
+    {
+        name: document.getElementById("name").value,
+        category: document.getElementById("category").value,
+        subcategory: document.getElementById("subcategory").value,
+        displayLat: document.getElementById("displayLat").value,
+        displayLng: document.getElementById("displayLng").value,
+        buildingLat: document.getElementById("buildingLat").value,
+        buildingLng: document.getElementById("buildingLng").value
     };
 
     pois.push(poi);
+
+    localStorage.setItem("pois", JSON.stringify(pois));
 
     updateTable();
 }
@@ -216,3 +229,4 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
