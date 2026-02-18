@@ -1,23 +1,14 @@
-body
-{
-font-family: Arial;
-}
-
-.container
-{
+.container{
 display:flex;
-width:100%;
 height:500px;
 }
 
-#map
-{
+#map{
 width:50%;
 height:100%;
 }
 
-#streetview
-{
+#streetview{
 width:50%;
 height:100%;
 }
