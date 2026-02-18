@@ -1,3 +1,49 @@
+let kmlLayers = [];
+
+document.getElementById("kmlFile").addEventListener("change", function(e)
+{
+    const files = Array.from(e.target.files);
+
+    kmlLayers.forEach(layer => layer.setMap(null));
+    kmlLayers = [];
+
+    files.forEach(file =>
+    {
+        const reader = new FileReader();
+
+        reader.onload = function(event)
+        {
+            const kmlText = event.target.result;
+
+            const blob = new Blob([kmlText],
+            {
+                type: "application/vnd.google-earth.kml+xml"
+            });
+
+            const url = URL.createObjectURL(blob);
+
+            const kmlLayer = new google.maps.KmlLayer(
+            {
+                url: url,
+                map: map,
+                preserveViewport: true
+            });
+
+            google.maps.event.addListenerOnce(
+                kmlLayer,
+                "defaultviewport_changed",
+                function()
+                {
+                    map.fitBounds(kmlLayer.getDefaultViewport());
+                }
+            );
+
+            kmlLayers.push(kmlLayer);
+        };
+
+        reader.readAsText(file);
+    });
+});
 let map;
 let streetView;
 
@@ -180,3 +226,4 @@ updateTable();
 }
 
 window.onload=initMap;
+
