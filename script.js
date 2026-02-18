@@ -55,25 +55,11 @@ function handleMapClick(latLng)
 
 
     // CLICK HANDLER (WORKING FEATURE - DO NOT CHANGE)
-    map.addListener("click", function(event)
-    {
-        const lat = event.latLng.lat();
-        const lng = event.latLng.lng();
+   map.addListener("click", function(event)
+{
+    handleMapClick(event.latLng);
+});
 
-        streetView.setPosition({ lat, lng });
-
-        if(displayMode)
-        {
-            document.getElementById("displayLat").value = lat.toFixed(6);
-            document.getElementById("displayLng").value = lng.toFixed(6);
-        }
-
-        if(buildingMode)
-        {
-            document.getElementById("buildingLat").value = lat.toFixed(6);
-            document.getElementById("buildingLng").value = lng.toFixed(6);
-        }
-    });
 
 
     // INIT KML parser
@@ -119,7 +105,12 @@ function loadFiles(event)
                     const geojson = JSON.parse(content);
 
                     map.data.addGeoJson(geojson);
+                    map.data.addListener("click", function(event)
+{
+    handleMapClick(event.latLng);
+});
 
+map.data.addGeoJson(geojson);
                     map.data.setStyle({
                         strokeColor:"#FF0000",
                         strokeWeight:2,
@@ -226,4 +217,5 @@ function deletePOI(index)
     pois.splice(index,1);
     updateTable();
 }
+
 
