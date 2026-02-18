@@ -32,6 +32,26 @@ function initMap()
     );
 
     map.setStreetView(streetView);
+    
+function handleMapClick(latLng)
+{
+    const lat = latLng.lat();
+    const lng = latLng.lng();
+
+    streetView.setPosition({ lat, lng });
+
+    if(displayMode)
+    {
+        document.getElementById("displayLat").value = lat.toFixed(6);
+        document.getElementById("displayLng").value = lng.toFixed(6);
+    }
+
+    if(buildingMode)
+    {
+        document.getElementById("buildingLat").value = lat.toFixed(6);
+        document.getElementById("buildingLng").value = lng.toFixed(6);
+    }
+}
 
 
     // CLICK HANDLER (WORKING FEATURE - DO NOT CHANGE)
@@ -206,3 +226,4 @@ function deletePOI(index)
     pois.splice(index,1);
     updateTable();
 }
+
