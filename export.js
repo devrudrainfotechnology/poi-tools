@@ -1,55 +1,46 @@
-function exportCSV()
+function exportExcel()
 {
+    if(pois.length === 0)
+    {
+        alert("No data to export");
+        return;
+    }
 
-let csv="Name,Category,SubCategory,DisplayLat,DisplayLng,BuildingLat,BuildingLng\n";
+    let ws_data = [
+        [
+            "Name",
+            "Category",
+            "SubCategory",
+            "Landline",
+            "Mobile",
+            "Mobile1",
+            "Display Lat",
+            "Display Lng",
+            "Building Lat",
+            "Building Lng"
+        ]
+    ];
 
-pois.forEach(p=>
-{
-csv+=`${p.name},${p.category},${p.subcategory},${p.displayLat},${p.displayLng},${p.buildingLat},${p.buildingLng}\n`;
-});
+    pois.forEach(p =>
+    {
+        ws_data.push([
+            p.name,
+            p.category,
+            p.subcategory,
+            p.landline,
+            p.mobile,
+            p.mobile1,
+            p.displayLat,
+            p.displayLng,
+            p.buildingLat,
+            p.buildingLng
+        ]);
+    });
 
-let blob=new Blob([csv]);
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
 
-let a=document.createElement("a");
+    XLSX.utils.book_append_sheet(wb, ws, "POI");
 
-a.href=URL.createObjectURL(blob);
-
-a.download="pois.csv";
-
-a.click();
-
-}
-
-function exportKML()
-{
-
-let kml=`<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-<Document>`;
-
-pois.forEach(p=>
-{
-
-kml+=`
-<Placemark>
-<name>${p.name}</name>
-<Point>
-<coordinates>${p.displayLng},${p.displayLat},0</coordinates>
-</Point>
-</Placemark>`;
-
-});
-
-kml+=`</Document></kml>`;
-
-let blob=new Blob([kml]);
-
-let a=document.createElement("a");
-
-a.href=URL.createObjectURL(blob);
-
-a.download="pois.kml";
-
-a.click();
-
+    XLSX.writeFile(wb, "POI_Data.xlsx");
 }
