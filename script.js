@@ -1,5 +1,6 @@
 let map;
 let streetView;
+let geoParser;
 
 let displayMode = false;
 let buildingMode = false;
@@ -10,44 +11,49 @@ let pois = [];
 // INIT MAP
 function initMap()
 {
-    const center = { lat:31.1471, lng:75.3412 };
+    const center = { lat: 31.1471, lng: 75.3412 };
 
     map = new google.maps.Map(
         document.getElementById("map"),
         {
-            zoom:7,
-            center:center,
-            mapTypeId:"roadmap"
+            zoom: 7,
+            center: center,
+            mapTypeId: "roadmap"
         }
     );
 
     streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
         {
-            position:center,
-            pov:{ heading:0, pitch:0 },
-            zoom:1
+            position: center,
+            pov: { heading: 0, pitch: 0 },
+            zoom: 1
         }
     );
 
     map.setStreetView(streetView);
 
 
-    // CLICK HANDLER
+    // CLICK HANDLER (THIS IS CRITICAL)
     map.addListener("click", function(event)
     {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
 
-        streetView.setPosition({lat,lng});
+        console.log("Clicked:", lat, lng);
 
-        if(displayMode)
+        // move street view
+        streetView.setPosition({ lat: lat, lng: lng });
+
+        // display location
+        if(displayMode === true)
         {
             document.getElementById("displayLat").value = lat.toFixed(6);
             document.getElementById("displayLng").value = lng.toFixed(6);
         }
 
-        if(buildingMode)
+        // building location
+        if(buildingMode === true)
         {
             document.getElementById("buildingLat").value = lat.toFixed(6);
             document.getElementById("buildingLng").value = lng.toFixed(6);
@@ -55,49 +61,36 @@ function initMap()
     });
 
 
-    // FILE LOAD HANDLER (GeoJSON)
-    document.getElementById("kmlFile")
-    .addEventListener("change", loadGeoJSON);
-}
+    // INIT KML PARSER
+    geoParser = new geoXML3.parser({
+        map: map,
+        zoom: true
+    });
 
 
+    // FILE INPUT HANDLER
+    const input = document.getElementById("kmlFile");
 
-// LOAD GEOJSON FILES (supports multiple)
-function loadGeoJSON(event)
-{
-    const files = event.target.files;
-
-    for(let file of files)
+    if(input)
     {
-        const reader = new FileReader();
-
-        reader.onload = function(e)
+        input.addEventListener("change", function(e)
         {
-            try
+            const files = e.target.files;
+
+            for(let file of files)
             {
-                const geojson = JSON.parse(e.target.result);
+                const reader = new FileReader();
 
-                map.data.addGeoJson(geojson);
+                reader.onload = function(event)
+                {
+                    geoParser.parseKmlString(event.target.result);
+                };
 
-                map.data.setStyle({
-                    strokeColor:"#FF0000",
-                    strokeWeight:2,
-                    fillColor:"#FF0000",
-                    fillOpacity:0.1
-                });
-
-                console.log("Loaded:", file.name);
+                reader.readAsText(file);
             }
-            catch(err)
-            {
-                alert("Invalid GeoJSON file");
-            }
-        };
-
-        reader.readAsText(file);
+        });
     }
 }
-
 
 
 // MODE BUTTONS
@@ -105,14 +98,17 @@ function setDisplayMode()
 {
     displayMode = true;
     buildingMode = false;
+
+    alert("Click map to set DISPLAY location");
 }
 
 function setBuildingMode()
 {
     displayMode = false;
     buildingMode = true;
-}
 
+    alert("Click map to set BUILDING location");
+}
 
 
 // SAVE POI
@@ -120,7 +116,7 @@ function savePOI()
 {
     const poi =
     {
-        name: document.getElementById("name").value || "Unidentified",
+        name: document.getElementById("name").value,
         category: document.getElementById("category").value,
         subcategory: document.getElementById("subcategory").value,
         displayLat: document.getElementById("displayLat").value,
@@ -133,7 +129,6 @@ function savePOI()
 
     updateTable();
 }
-
 
 
 // UPDATE TABLE
@@ -164,11 +159,7 @@ function updateTable()
         <td>${poi.displayLng}</td>
         <td>${poi.buildingLat}</td>
         <td>${poi.buildingLng}</td>
-        <td>
-        <button onclick="deletePOI(${index})">
-        Delete
-        </button>
-        </td>
+        <td><button onclick="deletePOI(${index})">Delete</button></td>
         </tr>
         `;
     });
@@ -177,10 +168,10 @@ function updateTable()
 }
 
 
-
 // DELETE
 function deletePOI(index)
 {
-    pois.splice(index,1);
+    pois.splice(index, 1);
+
     updateTable();
 }
