@@ -1,241 +1,132 @@
-let kmlLayers = [];
-
-document.getElementById("kmlFile").addEventListener("change", function(e)
-{
-    const files = Array.from(e.target.files);
-
-    kmlLayers.forEach(layer => layer.setMap(null));
-    kmlLayers = [];
-
-    files.forEach(file =>
-    {
-        const reader = new FileReader();
-
-        reader.onload = function(event)
-        {
-            const kmlText = event.target.result;
-
-            const blob = new Blob([kmlText],
-            {
-                type: "application/vnd.google-earth.kml+xml"
-            });
-
-            const url = URL.createObjectURL(blob);
-
-            const kmlLayer = new google.maps.KmlLayer(
-            {
-                url: url,
-                map: map,
-                preserveViewport: true
-            });
-
-            google.maps.event.addListenerOnce(
-                kmlLayer,
-                "defaultviewport_changed",
-                function()
-                {
-                    map.fitBounds(kmlLayer.getDefaultViewport());
-                }
-            );
-
-            kmlLayers.push(kmlLayer);
-        };
-
-        reader.readAsText(file);
-    });
-});
 let map;
-
-function initMap()
-{
-    map = new google.maps.Map(document.getElementById("map"),
-    {
-        center: { lat: 31.6340, lng: 74.8723 },
-        zoom: 7,
-        mapTypeId: "roadmap"
-    });
-}
-
 let streetView;
 
-let displayMode=false;
-let buildingMode=false;
+let displayMode = false;
+let buildingMode = false;
 
-let pois=[];
-
-let geoParser;
+let pois = [];
 
 function initMap()
 {
+    const center = { lat: 31.1471, lng: 75.3412 };
 
-map=new google.maps.Map(document.getElementById("map"),
-{
-center:{lat:31.1471,lng:75.3412},
-zoom:7,
-mapTypeId:"roadmap"
-});
+    map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+            zoom: 7,
+            center: center,
+            mapTypeId: "roadmap"
+        }
+    );
 
-streetView=new google.maps.StreetViewPanorama(
-document.getElementById("streetview"),
-{
-position:{lat:31.1471,lng:75.3412},
-pov:{heading:0,pitch:0},
-zoom:1
-});
+    streetView = new google.maps.StreetViewPanorama(
+        document.getElementById("streetview"),
+        {
+            position: center,
+            pov: { heading: 0, pitch: 0 },
+            zoom: 1
+        }
+    );
 
-map.setStreetView(streetView);
+    map.setStreetView(streetView);
 
-map.addListener("click",function(e)
-{
+    // CLICK EVENT
+    map.addListener("click", function(event)
+    {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
 
-let lat=e.latLng.lat();
-let lng=e.latLng.lng();
+        console.log("Clicked:", lat, lng);
 
-streetView.setPosition({lat,lng});
+        streetView.setPosition({ lat, lng });
 
-if(displayMode)
-{
-displayLat.value=lat;
-displayLng.value=lng;
+        if(displayMode)
+        {
+            document.getElementById("displayLat").value = lat.toFixed(6);
+            document.getElementById("displayLng").value = lng.toFixed(6);
+        }
+
+        if(buildingMode)
+        {
+            document.getElementById("buildingLat").value = lat.toFixed(6);
+            document.getElementById("buildingLng").value = lng.toFixed(6);
+        }
+    });
 }
-
-if(buildingMode)
-{
-buildingLat.value=lat;
-buildingLng.value=lng;
-}
-
-});
-
-geoParser=new geoXML3.parser(
-{
-map:map,
-zoom:true,
-singleInfoWindow:true,
-afterParse:function(doc)
-{
-
-doc.forEach(layer=>
-{
-
-if(layer.gpolygons)
-{
-layer.gpolygons.forEach(poly=>
-{
-poly.setOptions(
-{
-fillColor:"#ff0000",
-strokeColor:"#ff0000",
-strokeWeight:2,
-fillOpacity:0.2
-});
-});
-}
-
-});
-
-}
-});
-
-}
-
-document.getElementById("kmlFile").addEventListener("change",function(e)
-{
-
-for(let file of e.target.files)
-{
-
-let reader=new FileReader();
-
-reader.onload=function(event)
-{
-geoParser.parseKmlString(event.target.result);
-};
-
-reader.readAsText(file);
-
-}
-
-});
 
 function setDisplayMode()
 {
-displayMode=true;
-buildingMode=false;
+    displayMode = true;
+    buildingMode = false;
+
+    alert("Click map to set DISPLAY location");
 }
 
 function setBuildingMode()
 {
-displayMode=false;
-buildingMode=true;
+    displayMode = false;
+    buildingMode = true;
+
+    alert("Click map to set BUILDING location");
 }
 
 function savePOI()
 {
+    const poi =
+    {
+        name: name.value,
+        category: category.value,
+        subcategory: subcategory.value,
+        displayLat: displayLat.value,
+        displayLng: displayLng.value,
+        buildingLat: buildingLat.value,
+        buildingLng: buildingLng.value
+    };
 
-let poi=
-{
-name:name.value,
-category:category.value,
-subcategory:subcategory.value,
-displayLat:displayLat.value,
-displayLng:displayLng.value,
-buildingLat:buildingLat.value,
-buildingLng:buildingLng.value
-};
+    pois.push(poi);
 
-pois.push(poi);
-
-updateTable();
-
+    updateTable();
 }
 
 function updateTable()
 {
+    const table = document.getElementById("poiTable");
 
-let table=document.getElementById("poiTable");
+    let html =
+    `
+    <tr>
+    <th>Name</th>
+    <th>Category</th>
+    <th>SubCategory</th>
+    <th>Display Lat</th>
+    <th>Display Lng</th>
+    <th>Building Lat</th>
+    <th>Building Lng</th>
+    <th>Delete</th>
+    </tr>
+    `;
 
-table.innerHTML=
-`
-<tr>
-<th>Name</th>
-<th>Category</th>
-<th>SubCategory</th>
-<th>Display Lat</th>
-<th>Display Lng</th>
-<th>Building Lat</th>
-<th>Building Lng</th>
-<th>Delete</th>
-</tr>
-`;
+    pois.forEach((poi,index)=>
+    {
+        html += `
+        <tr>
+        <td>${poi.name}</td>
+        <td>${poi.category}</td>
+        <td>${poi.subcategory}</td>
+        <td>${poi.displayLat}</td>
+        <td>${poi.displayLng}</td>
+        <td>${poi.buildingLat}</td>
+        <td>${poi.buildingLng}</td>
+        <td><button onclick="deletePOI(${index})">Delete</button></td>
+        </tr>
+        `;
+    });
 
-pois.forEach((poi,index)=>
-{
-
-let row=table.insertRow();
-
-row.insertCell(0).innerText=poi.name;
-row.insertCell(1).innerText=poi.category;
-row.insertCell(2).innerText=poi.subcategory;
-row.insertCell(3).innerText=poi.displayLat;
-row.insertCell(4).innerText=poi.displayLng;
-row.insertCell(5).innerText=poi.buildingLat;
-row.insertCell(6).innerText=poi.buildingLng;
-
-let del=row.insertCell(7);
-
-del.innerHTML=`<button onclick="deletePOI(${index})">Delete</button>`;
-
-});
-
+    table.innerHTML = html;
 }
 
 function deletePOI(index)
 {
-pois.splice(index,1);
-updateTable();
+    pois.splice(index,1);
+    updateTable();
 }
-
-window.onload=initMap;
-
-
