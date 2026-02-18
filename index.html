@@ -8,12 +8,10 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Google Maps API -->
 <script async defer
 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&callback=initMap">
 </script>
 
-<!-- geoXML3 for KML -->
 <script src="https://cdn.jsdelivr.net/gh/geocodezip/geoxml3@master/polys/geoxml3.js"></script>
 
 </head>
@@ -24,19 +22,40 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 
 <input type="file" id="fileInput" multiple accept=".kml,.geojson,.json">
 
-<button onclick="setDisplayMode()">Display Location</button>
-<button onclick="setBuildingMode()">Building Location</button>
+<br><br>
+
+<button onclick="setDisplayMode()">Select Display Location</button>
+<button onclick="setBuildingMode()">Select Building Location</button>
 <button onclick="savePOI()">Save POI</button>
 
 <div class="container">
 
 <div id="streetview"></div>
-
 <div id="map"></div>
 
 </div>
 
-<h3>Coordinates</h3>
+<h3>POI Entry Form</h3>
+
+Name:
+<input id="poi_name">
+
+Category:
+<input id="category">
+
+Sub Category:
+<input id="subcat">
+
+Landline:
+<input id="landline">
+
+Mobile:
+<input id="mobile">
+
+Mobile 1:
+<input id="mobile1">
+
+<br><br>
 
 Display Lat:
 <input id="displayLat">
@@ -50,9 +69,9 @@ Building Lat:
 Building Lng:
 <input id="buildingLng">
 
-<h3>Saved POI</h3>
+<h3>Saved POI List</h3>
 
-<table id="poiTable" border="1"></table>
+<table border="1" id="poiTable"></table>
 
 <script src="script.js"></script>
 
