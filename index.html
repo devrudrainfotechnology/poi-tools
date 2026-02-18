@@ -8,8 +8,10 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&libraries=places"></script>
+<!-- Google Maps API WITH CALLBACK -->
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&libraries=places&callback=initMap">
+</script>
 
 <!-- GeoXML3 for KML -->
 <script src="https://cdn.jsdelivr.net/gh/geocodezip/geoxml3@master/polys/geoxml3.js"></script>
@@ -61,29 +63,34 @@
 
 <h2>POI Details</h2>
 
-Name:
+<div class="form">
+
+<label>Name:</label>
 <input id="name">
 
-Category:
+<label>Category:</label>
 <input id="category">
 
-Sub Category:
+<label>Sub Category:</label>
 <input id="subcategory">
 
-Display Lat:
-<input id="displayLat">
+<label>Display Lat:</label>
+<input id="displayLat" readonly>
 
-Display Lng:
-<input id="displayLng">
+<label>Display Lng:</label>
+<input id="displayLng" readonly>
 
-Building Lat:
-<input id="buildingLat">
+<label>Building Lat:</label>
+<input id="buildingLat" readonly>
 
-Building Lng:
-<input id="buildingLng">
+<label>Building Lng:</label>
+<input id="buildingLng" readonly>
 
 <button onclick="savePOI()">Save</button>
 
+</div>
+
+<!-- Scripts MUST load after HTML -->
 <script src="script.js"></script>
 <script src="export.js"></script>
 
