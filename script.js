@@ -8,19 +8,22 @@ let buildingMode = false;
 let pois = [];
 
 
-// INIT MAP
+// 
+MAP
 function initMap()
 {
-    const center = { lat:31.1471, lng:75.3412 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 7,
+        center: { lat:31.1471, lng:75.3412 }
+    });
 
-    map = new google.maps.Map(
-        document.getElementById("map"),
-        {
-            zoom:7,
-            center:center,
-            mapTypeId:"roadmap"
-        }
-    );
+    map.data.setClickable(true);
+
+    map.addListener("click", function(event)
+    {
+        handleMapClick(event.latLng);
+    });
+}
 
     streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
@@ -105,18 +108,22 @@ function loadFiles(event)
                     const geojson = JSON.parse(content);
 
                     map.data.addGeoJson(geojson);
-                    map.data.addListener("click", function(event)
+
+                    // Allow GeoJSON layer clicks
+map.data.setStyle({
+    clickable: true,
+    strokeColor: "#FF0000",
+    strokeWeight: 2,
+    fillColor: "#FF0000",
+    fillOpacity: 0.1
+});
+
+// Forward GeoJSON click to lat/lng handler
+map.data.addListener("click", function(event)
 {
     handleMapClick(event.latLng);
 });
-
-map.data.addGeoJson(geojson);
-                    map.data.setStyle({
-                        strokeColor:"#FF0000",
-                        strokeWeight:2,
-                        fillColor:"#FF0000",
-                        fillOpacity:0.1
-                    });
+                    
 
                     console.log("GeoJSON loaded:", file.name);
                 }
@@ -134,8 +141,6 @@ map.data.addGeoJson(geojson);
         reader.readAsText(file);
     }
 }
-
-
 
 // MODE BUTTONS (WORKING FEATURE)
 function setDisplayMode()
