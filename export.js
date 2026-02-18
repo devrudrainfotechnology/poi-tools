@@ -1,86 +1,55 @@
-let poiList = [];
+function exportCSV()
+{
 
-function savePOI() {
+let csv="Name,Category,SubCategory,DisplayLat,DisplayLng,BuildingLat,BuildingLng\n";
 
-    const name = document.getElementById("name").value;
-    const category = document.getElementById("category").value;
-    const subcategory = document.getElementById("subcategory").value;
-    const dlat = document.getElementById("display_lat").value;
-    const dlng = document.getElementById("display_lng").value;
-    const blat = document.getElementById("building_lat").value;
-    const blng = document.getElementById("building_lng").value;
+pois.forEach(p=>
+{
+csv+=`${p.name},${p.category},${p.subcategory},${p.displayLat},${p.displayLng},${p.buildingLat},${p.buildingLng}\n`;
+});
 
-    if(!name) {
-        alert("Enter name");
-        return;
-    }
+let blob=new Blob([csv]);
 
-    const poi = {
-        id: Date.now(),
-        name,
-        category,
-        subcategory,
-        dlat,
-        dlng,
-        blat,
-        blng
-    };
+let a=document.createElement("a");
 
-    poiList.push(poi);
+a.href=URL.createObjectURL(blob);
 
-    renderPOIList();
+a.download="pois.csv";
+
+a.click();
+
 }
 
-function renderPOIList() {
+function exportKML()
+{
 
-    let html = "";
+let kml=`<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>`;
 
-    poiList.forEach(poi => {
+pois.forEach(p=>
+{
 
-        html += `
-        <tr>
-            <td>${poi.name}</td>
-            <td>${poi.category}</td>
-            <td>${poi.subcategory}</td>
-            <td>${poi.dlat}</td>
-            <td>${poi.dlng}</td>
-            <td>${poi.blat}</td>
-            <td>${poi.blng}</td>
-            <td>
-                <button onclick="deletePOI(${poi.id})">🗑 Delete</button>
-            </td>
-        </tr>
-        `;
-    });
+kml+=`
+<Placemark>
+<name>${p.name}</name>
+<Point>
+<coordinates>${p.displayLng},${p.displayLat},0</coordinates>
+</Point>
+</Placemark>`;
 
-    document.getElementById("poiTableBody").innerHTML = html;
-}
+});
 
-function deletePOI(id) {
+kml+=`</Document></kml>`;
 
-    poiList = poiList.filter(p => p.id !== id);
+let blob=new Blob([kml]);
 
-    renderPOIList();
-}
+let a=document.createElement("a");
 
-function exportCSV() {
+a.href=URL.createObjectURL(blob);
 
-    let csv =
-"Name,Category,SubCategory,DisplayLat,DisplayLng,BuildingLat,BuildingLng\n";
+a.download="pois.kml";
 
-    poiList.forEach(p => {
+a.click();
 
-        csv += `${p.name},${p.category},${p.subcategory},${p.dlat},${p.dlng},${p.blat},${p.blng}\n`;
-
-    });
-
-    const blob = new Blob([csv]);
-
-    const a = document.createElement("a");
-
-    a.href = URL.createObjectURL(blob);
-
-    a.download = "POI.csv";
-
-    a.click();
 }
