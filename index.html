@@ -28,7 +28,7 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 <button onclick="setBuildingMode()">Select Building Location</button>
 <button onclick="savePOI()">Save POI</button>
 
-<button onclick="exportCSV()">Export Excel</button>
+<button onclick="exportExcel()">Export Excel</button>
 <button onclick="exportKML()">Export KML</button>
 
 <div class="container">
@@ -38,41 +38,48 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 
 </div>
 
-<h3>POI Entry</h3>
+<h2>POI Entry</h2>
 
-Name:
-<input id="poi_name">
+<div class="poi-form">
 
-Category:
+<label>Name:</label>
+<input id="name">
+
+<label>Category:</label>
 <input id="category">
 
-SubCategory:
-<input id="subcat">
+<label>SubCategory:</label>
+<input id="subcategory">
 
-Landline:
+<label>Landline:</label>
 <input id="landline">
 
-Mobile:
+<label>Mobile:</label>
 <input id="mobile">
 
-Mobile1:
+<label>Mobile 1:</label>
 <input id="mobile1">
 
 <br><br>
 
-Display Lat:
-<input id="displayLat">
+<label>Display Lat:</label>
+<input id="displayLat" readonly>
 
-Display Lng:
-<input id="displayLng">
+<label>Display Lng:</label>
+<input id="displayLng" readonly>
 
-Building Lat:
-<input id="buildingLat">
+<label>Building Lat:</label>
+<input id="buildingLat" readonly>
 
-Building Lng:
-<input id="buildingLng">
+<label>Building Lng:</label>
+<input id="buildingLng" readonly>
 
-<h3>Saved POI</h3>
+</div>
+
+<!-- SAVE BUTTON BELOW FORM -->
+<div class="save-section">
+    <button class="save-btn" onclick="savePOI()">💾 SAVE POI</button>
+</div>
 
 <table border="1" id="poiTable"></table>
 
@@ -80,3 +87,4 @@ Building Lng:
 
 </body>
 </html>
+
