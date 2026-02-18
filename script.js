@@ -11,49 +11,44 @@ let pois = [];
 // INIT MAP
 function initMap()
 {
-    const center = { lat: 31.1471, lng: 75.3412 };
+    const center = { lat:31.1471, lng:75.3412 };
 
     map = new google.maps.Map(
         document.getElementById("map"),
         {
-            zoom: 7,
-            center: center,
-            mapTypeId: "roadmap"
+            zoom:7,
+            center:center,
+            mapTypeId:"roadmap"
         }
     );
 
     streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
         {
-            position: center,
-            pov: { heading: 0, pitch: 0 },
-            zoom: 1
+            position:center,
+            pov:{ heading:0, pitch:0 },
+            zoom:1
         }
     );
 
     map.setStreetView(streetView);
 
 
-    // CLICK HANDLER (THIS IS CRITICAL)
+    // CLICK HANDLER (WORKING FEATURE - DO NOT CHANGE)
     map.addListener("click", function(event)
     {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
 
-        console.log("Clicked:", lat, lng);
+        streetView.setPosition({ lat, lng });
 
-        // move street view
-        streetView.setPosition({ lat: lat, lng: lng });
-
-        // display location
-        if(displayMode === true)
+        if(displayMode)
         {
             document.getElementById("displayLat").value = lat.toFixed(6);
             document.getElementById("displayLng").value = lng.toFixed(6);
         }
 
-        // building location
-        if(buildingMode === true)
+        if(buildingMode)
         {
             document.getElementById("buildingLat").value = lat.toFixed(6);
             document.getElementById("buildingLng").value = lng.toFixed(6);
@@ -61,54 +56,89 @@ function initMap()
     });
 
 
-    // INIT KML PARSER
+    // INIT KML parser
     geoParser = new geoXML3.parser({
         map: map,
         zoom: true
     });
 
 
-    // FILE INPUT HANDLER
-    const input = document.getElementById("kmlFile");
+    // FILE LOADER (SUPPORTS BOTH KML AND GEOJSON)
+    document.getElementById("kmlFile")
+    .addEventListener("change", loadFiles);
+}
 
-    if(input)
+
+
+// LOAD FILES FUNCTION
+function loadFiles(event)
+{
+    const files = event.target.files;
+
+    for(let file of files)
     {
-        input.addEventListener("change", function(e)
+        const reader = new FileReader();
+
+        reader.onload = function(e)
         {
-            const files = e.target.files;
+            const content = e.target.result;
 
-            for(let file of files)
+            // Detect file type
+            if(file.name.toLowerCase().endsWith(".kml"))
             {
-                const reader = new FileReader();
-
-                reader.onload = function(event)
-                {
-                    geoParser.parseKmlString(event.target.result);
-                };
-
-                reader.readAsText(file);
+                // Load KML
+                geoParser.parseKmlString(content);
+                console.log("KML loaded:", file.name);
             }
-        });
+            else if(file.name.toLowerCase().endsWith(".geojson") ||
+                    file.name.toLowerCase().endsWith(".json"))
+            {
+                // Load GeoJSON
+                try
+                {
+                    const geojson = JSON.parse(content);
+
+                    map.data.addGeoJson(geojson);
+
+                    map.data.setStyle({
+                        strokeColor:"#FF0000",
+                        strokeWeight:2,
+                        fillColor:"#FF0000",
+                        fillOpacity:0.1
+                    });
+
+                    console.log("GeoJSON loaded:", file.name);
+                }
+                catch(err)
+                {
+                    alert("Invalid GeoJSON file");
+                }
+            }
+            else
+            {
+                alert("Unsupported file type: " + file.name);
+            }
+        };
+
+        reader.readAsText(file);
     }
 }
 
 
-// MODE BUTTONS
+
+// MODE BUTTONS (WORKING FEATURE)
 function setDisplayMode()
 {
     displayMode = true;
     buildingMode = false;
-
-    alert("Click map to set DISPLAY location");
 }
 
 function setBuildingMode()
 {
     displayMode = false;
     buildingMode = true;
-
-    alert("Click map to set BUILDING location");
 }
+
 
 
 // SAVE POI
@@ -129,6 +159,7 @@ function savePOI()
 
     updateTable();
 }
+
 
 
 // UPDATE TABLE
@@ -168,10 +199,10 @@ function updateTable()
 }
 
 
-// DELETE
+
+// DELETE POI
 function deletePOI(index)
 {
-    pois.splice(index, 1);
-
+    pois.splice(index,1);
     updateTable();
 }
