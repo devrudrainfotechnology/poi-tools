@@ -32,24 +32,32 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 <button onclick="exportKML()">Export KML</button>
 
 <div class="container">
-
-<div id="streetview"></div>
-<div id="map"></div>
-
+    <div id="streetview"></div>
+    <div id="map"></div>
 </div>
 
 <h2>POI Entry</h2>
 
-<div class="container">
+<div class="poi-form">
 
-    <!-- STREET VIEW -->
-<div id="streetview"></div>
+Name: <input id="name">
+Category: <input id="category">
+SubCategory: <input id="subcategory">
+Landline: <input id="landline">
+Mobile: <input id="mobile">
+Mobile1: <input id="mobile1">
 
-    <!-- MAP -->
-<div id="map"></div>
+<br><br>
+
+Display Lat: <input id="displayLat">
+Display Lng: <input id="displayLng">
+
+Building Lat: <input id="buildingLat">
+Building Lng: <input id="buildingLng">
+
+<button class="save-btn" onclick="savePOI()">💾 SAVE POI</button>
 
 </div>
-
 
 <div class="poi-form">
 
@@ -103,6 +111,7 @@ src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y
 
 </body>
 </html>
+
 
 
 
