@@ -3,7 +3,7 @@
     flex-direction: row;
     height: 500px;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
 }
 
 #streetview {
@@ -15,3 +15,4 @@
     flex: 1;
     height: 500px;
 }
+
