@@ -7,8 +7,6 @@ let buildingMode = false;
 
 let pois = [];
 
-
-// MAIN MAP INIT
 function initMap()
 {
     const center = { lat:31.1471, lng:75.3412 };
@@ -16,82 +14,61 @@ function initMap()
     map = new google.maps.Map(
         document.getElementById("map"),
         {
-            zoom:7,
             center:center,
-            mapTypeId:"roadmap"
+            zoom:7
         }
     );
-
-    // enable GeoJSON clicking
-    map.data.setClickable(true);
-
 
     streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
         {
             position:center,
-            pov:{ heading:0, pitch:0 },
+            pov:{heading:0,pitch:0},
             zoom:1
         }
     );
 
     map.setStreetView(streetView);
 
-
-    // CLICK HANDLER FOR MAP
-    map.addListener("click", function(event)
-    {
-        handleMapClick(event.latLng);
-    });
-
-
-    // CLICK HANDLER FOR GEOJSON
-    map.data.addListener("click", function(event)
-    {
-        handleMapClick(event.latLng);
-    });
-
-
-    // INIT KML parser
     geoParser = new geoXML3.parser({
         map: map,
         zoom: true
     });
 
+    map.addListener("click", function(event)
+    {
+        handleClick(event.latLng);
+    });
 
-    // FILE LOADER
-    document.getElementById("kmlFile")
+    map.data.addListener("click", function(event)
+    {
+        handleClick(event.latLng);
+    });
+
+    document.getElementById("fileInput")
         .addEventListener("change", loadFiles);
 }
 
-
-
-// UNIVERSAL CLICK HANDLER
-function handleMapClick(latLng)
+function handleClick(latLng)
 {
     const lat = latLng.lat();
     const lng = latLng.lng();
 
-    console.log("Clicked:", lat, lng);
-
-    streetView.setPosition({ lat, lng });
+    streetView.setPosition({lat,lng});
 
     if(displayMode)
     {
-        document.getElementById("displayLat").value = lat.toFixed(6);
-        document.getElementById("displayLng").value = lng.toFixed(6);
+        document.getElementById("displayLat").value = lat;
+        document.getElementById("displayLng").value = lng;
     }
 
     if(buildingMode)
     {
-        document.getElementById("buildingLat").value = lat.toFixed(6);
-        document.getElementById("buildingLng").value = lng.toFixed(6);
+        document.getElementById("buildingLat").value = lat;
+        document.getElementById("buildingLng").value = lng;
     }
 }
 
-
-
-// LOAD KML AND GEOJSON
 function loadFiles(event)
 {
     const files = event.target.files;
@@ -107,35 +84,21 @@ function loadFiles(event)
             if(file.name.toLowerCase().endsWith(".kml"))
             {
                 geoParser.parseKmlString(content);
-                console.log("Loaded KML:", file.name);
             }
-            else if(file.name.toLowerCase().endsWith(".geojson") ||
-                    file.name.toLowerCase().endsWith(".json"))
+            else if(file.name.toLowerCase().endsWith(".geojson")
+                 || file.name.toLowerCase().endsWith(".json"))
             {
-                try
-                {
-                    const geojson = JSON.parse(content);
+                const geojson = JSON.parse(content);
 
-                    map.data.addGeoJson(geojson);
+                map.data.addGeoJson(geojson);
 
-                    map.data.setStyle({
-                        clickable:true,
-                        strokeColor:"#FF0000",
-                        strokeWeight:2,
-                        fillColor:"#FF0000",
-                        fillOpacity:0.1
-                    });
-
-                    console.log("Loaded GeoJSON:", file.name);
-                }
-                catch(err)
-                {
-                    alert("Invalid GeoJSON file");
-                }
-            }
-            else
-            {
-                alert("Unsupported file type");
+                map.data.setStyle({
+                    clickable:true,
+                    strokeColor:"#FF0000",
+                    strokeWeight:2,
+                    fillColor:"#FF0000",
+                    fillOpacity:0.1
+                });
             }
         };
 
@@ -143,9 +106,6 @@ function loadFiles(event)
     }
 }
 
-
-
-// MODE BUTTONS
 function setDisplayMode()
 {
     displayMode = true;
@@ -158,20 +118,14 @@ function setBuildingMode()
     buildingMode = true;
 }
 
-
-
-// SAVE POI
 function savePOI()
 {
     const poi =
     {
-        name: document.getElementById("name").value,
-        category: document.getElementById("category").value,
-        subcategory: document.getElementById("subcategory").value,
-        displayLat: document.getElementById("displayLat").value,
-        displayLng: document.getElementById("displayLng").value,
-        buildingLat: document.getElementById("buildingLat").value,
-        buildingLng: document.getElementById("buildingLng").value
+        displayLat:displayLat.value,
+        displayLng:displayLng.value,
+        buildingLat:buildingLat.value,
+        buildingLng:buildingLng.value
     };
 
     pois.push(poi);
@@ -179,49 +133,29 @@ function savePOI()
     updateTable();
 }
 
-
-
-// UPDATE TABLE
 function updateTable()
 {
     let html =
     `
     <tr>
-    <th>Name</th>
-    <th>Category</th>
-    <th>SubCategory</th>
     <th>Display Lat</th>
     <th>Display Lng</th>
     <th>Building Lat</th>
     <th>Building Lng</th>
-    <th>Delete</th>
     </tr>
     `;
 
-    pois.forEach((poi,index)=>
+    pois.forEach(p =>
     {
         html += `
         <tr>
-        <td>${poi.name}</td>
-        <td>${poi.category}</td>
-        <td>${poi.subcategory}</td>
-        <td>${poi.displayLat}</td>
-        <td>${poi.displayLng}</td>
-        <td>${poi.buildingLat}</td>
-        <td>${poi.buildingLng}</td>
-        <td><button onclick="deletePOI(${index})">Delete</button></td>
+        <td>${p.displayLat}</td>
+        <td>${p.displayLng}</td>
+        <td>${p.buildingLat}</td>
+        <td>${p.buildingLng}</td>
         </tr>
         `;
     });
 
-    document.getElementById("poiTable").innerHTML = html;
-}
-
-
-
-// DELETE POI
-function deletePOI(index)
-{
-    pois.splice(index,1);
-    updateTable();
+    poiTable.innerHTML = html;
 }
