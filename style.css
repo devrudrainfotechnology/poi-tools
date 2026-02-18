@@ -1,3 +1,14 @@
+body
+{
+font-family: Arial;
+margin: 10px;
+}
+
+.toolbar
+{
+margin-bottom:10px;
+}
+
 .container
 {
 display:flex;
@@ -6,10 +17,23 @@ height:500px;
 
 #streetview
 {
-flex:1;
+width:50%;
+height:100%;
 }
 
 #map
 {
-flex:1;
+width:50%;
+height:100%;
+}
+
+table
+{
+border-collapse: collapse;
+}
+
+td,th
+{
+border:1px solid black;
+padding:5px;
 }
