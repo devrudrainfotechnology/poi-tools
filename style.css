@@ -1,61 +1,17 @@
-.poi-form
-{
-    background:#f4f6f8;
-    padding:15px;
-    border-radius:6px;
-    margin-bottom:10px;
-}
-
-.poi-form label
-{
-    font-weight:bold;
-    margin-left:10px;
-}
-
-.poi-form input
-{
-    margin:5px;
-    padding:6px;
-    width:180px;
-}
-.container
-{
+.container {
     display: flex;
+    flex-direction: row;
     height: 500px;
-    margin-top: 10px;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-#streetview
-{
-    width: 50%;
-    height: 500px;
-}
-
-#map
-{
-    width: 50%;
+#streetview {
+    flex: 1;
     height: 500px;
 }
 
-.save-section
-{
-    text-align:center;
-    margin-top:10px;
+#map {
+    flex: 1;
+    height: 500px;
 }
-
-.save-btn
-{
-    background:#28a745;
-    color:white;
-    font-size:18px;
-    padding:10px 30px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-.save-btn:hover
-{
-    background:#218838;
-}
-
