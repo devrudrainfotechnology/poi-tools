@@ -26,6 +26,8 @@
 
 <button onclick="exportExcel()">Export Excel</button>
 <button onclick="exportKML()">Export KML</button>
+<button onclick="scanText()">🔍 Scan & Translate</button>
+
 
 <div class="container">
     <div id="streetview"></div>
@@ -82,8 +84,13 @@
 <script src="export.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&callback=initMap"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </body>
 </html>
+
 
 
 
