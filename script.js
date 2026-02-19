@@ -7,8 +7,6 @@ window.onload = function()
         pois = JSON.parse(saved);
         updateTable();
     }
-
-    initMap();
 }
 
 let map;
@@ -286,6 +284,7 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
 
 
