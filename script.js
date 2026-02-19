@@ -12,14 +12,8 @@ window.onload = function()
 let map;
 let streetView;
 let geoParser;
+let pois = [];
 
-let displayMode=false;
-let buildingMode=false;
-
-let pois=[];
-
-
-// INIT MAP
 window.initMap = function()
 {
     const center = {lat:31.1471, lng:75.3412};
@@ -214,7 +208,6 @@ function updateTable()
 
     document.getElementById("poiTable").innerHTML = html;
 }
-
 function deletePOI(index)
 {
     if(confirm("Are you sure you want to delete this POI?"))
@@ -287,6 +280,7 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
 
 
