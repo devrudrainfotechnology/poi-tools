@@ -124,28 +124,59 @@ function setBuildingMode()
 // SAVE
 function savePOI()
 {
+    const name = document.getElementById("name").value.trim();
+    const category = document.getElementById("category").value.trim();
+    const subcategory = document.getElementById("subcategory").value.trim();
+    const landline = document.getElementById("landline").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    const mobile1 = document.getElementById("mobile1").value.trim();
+    const displayLat = document.getElementById("displayLat").value;
+    const displayLng = document.getElementById("displayLng").value;
+    const buildingLat = document.getElementById("buildingLat").value;
+    const buildingLng = document.getElementById("buildingLng").value;
+
+    // ✅ Numeric Validation
+    if (mobile && !/^\d{10}$/.test(mobile))
+    {
+        alert("Mobile number must be exactly 10 digits.");
+        return;
+    }
+
+    if (mobile1 && !/^\d{10}$/.test(mobile1))
+    {
+        alert("Mobile1 number must be exactly 10 digits.");
+        return;
+    }
+
+    if (landline && !/^\d+$/.test(landline))
+    {
+        alert("Landline must contain only numbers.");
+        return;
+    }
+
     const poi =
     {
-        name: document.getElementById("name").value,
-        category: document.getElementById("category").value,
-        subcategory: document.getElementById("subcategory").value,
-        landline: document.getElementById("landline").value,
-        mobile: document.getElementById("mobile").value,
-        mobile1: document.getElementById("mobile1").value,
-        displayLat: document.getElementById("displayLat").value,
-        displayLng: document.getElementById("displayLng").value,
-        buildingLat: document.getElementById("buildingLat").value,
-        buildingLng: document.getElementById("buildingLng").value
+        name,
+        category,
+        subcategory,
+        landline,
+        mobile,
+        mobile1,
+        displayLat,
+        displayLng,
+        buildingLat,
+        buildingLng
     };
 
     pois.push(poi);
-
     localStorage.setItem("pois", JSON.stringify(pois));
 
     updateTable();
+    clearForm();   // ✅ auto clear form after save
 }
 
 // UPDATE TABLE
+function updateTable()
 function updateTable()
 {
     let html = `
@@ -160,30 +191,38 @@ function updateTable()
 <th>DisplayLng</th>
 <th>BuildingLat</th>
 <th>BuildingLng</th>
+<th>Delete</th>
 </tr>`;
 
-    pois.forEach(p=>{
+    pois.forEach((p, index)=>{
         html += `
 <tr>
-<td>${p.name || ""}</td>
-<td>${p.category || ""}</td>
-<td>${p.subcategory || ""}</td>
-<td>${p.landline || ""}</td>
-<td>${p.mobile || ""}</td>
-<td>${p.mobile1 || ""}</td>
-<td>${p.displayLat || ""}</td>
-<td>${p.displayLng || ""}</td>
-<td>${p.buildingLat || ""}</td>
-<td>${p.buildingLng || ""}</td>
+<td>${p.name ?? ""}</td>
+<td>${p.category ?? ""}</td>
+<td>${p.subcategory ?? ""}</td>
+<td>${p.landline ?? ""}</td>
+<td>${p.mobile ?? ""}</td>
+<td>${p.mobile1 ?? ""}</td>
+<td>${p.displayLat ?? ""}</td>
+<td>${p.displayLng ?? ""}</td>
+<td>${p.buildingLat ?? ""}</td>
+<td>${p.buildingLng ?? ""}</td>
+<td><button onclick="deletePOI(${index})">❌</button></td>
 </tr>`;
     });
 
     document.getElementById("poiTable").innerHTML = html;
 }
 
-poiTable.innerHTML=html;
+function deletePOI(index)
+{
+    if(confirm("Are you sure you want to delete this POI?"))
+    {
+        pois.splice(index, 1);
+        localStorage.setItem("pois", JSON.stringify(pois));
+        updateTable();
+    }
 }
-
 
 // EXPORT CSV (Excel)
 function exportCSV()
@@ -202,6 +241,20 @@ csv+=`${p.name},${p.category},${p.subcat},${p.landline},${p.mobile},${p.mobile1}
     link.download="POI_Data.csv";
 
     link.click();
+}
+
+function clearForm()
+{
+    document.getElementById("name").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("subcategory").value = "";
+    document.getElementById("landline").value = "";
+    document.getElementById("mobile").value = "";
+    document.getElementById("mobile1").value = "";
+    document.getElementById("displayLat").value = "";
+    document.getElementById("displayLng").value = "";
+    document.getElementById("buildingLat").value = "";
+    document.getElementById("buildingLng").value = "";
 }
 
 
@@ -233,6 +286,7 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
 
 
