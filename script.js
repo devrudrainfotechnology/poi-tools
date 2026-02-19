@@ -148,7 +148,7 @@ function savePOI()
 // UPDATE TABLE
 function updateTable()
 {
-    let html=`
+    let html = `
 <tr>
 <th>Name</th>
 <th>Category</th>
@@ -163,20 +163,23 @@ function updateTable()
 </tr>`;
 
     pois.forEach(p=>{
-html+=`
+        html += `
 <tr>
-<td>${p.name}</td>
-<td>${p.category}</td>
-<td>${p.subcategory}</td>
-<td>${p.landline}</td>
-<td>${p.mobile}</td>
-<td>${p.mobile1}</td>
-<td>${p.displayLat}</td>
-<td>${p.displayLng}</td>
-<td>${p.buildingLat}</td>
-<td>${p.buildingLng}</td>
+<td>${p.name || ""}</td>
+<td>${p.category || ""}</td>
+<td>${p.subcategory || ""}</td>
+<td>${p.landline || ""}</td>
+<td>${p.mobile || ""}</td>
+<td>${p.mobile1 || ""}</td>
+<td>${p.displayLat || ""}</td>
+<td>${p.displayLng || ""}</td>
+<td>${p.buildingLat || ""}</td>
+<td>${p.buildingLng || ""}</td>
 </tr>`;
-});
+    });
+
+    document.getElementById("poiTable").innerHTML = html;
+}
 
 poiTable.innerHTML=html;
 }
@@ -230,5 +233,6 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
 
