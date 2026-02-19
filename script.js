@@ -56,24 +56,23 @@ function initMap()
 // HANDLE CLICK
 function handleClick(latLng)
 {
-    const lat=latLng.lat();
-    const lng=latLng.lng();
+    const lat = latLng.lat();
+    const lng = latLng.lng();
 
-    streetView.setPosition({lat,lng});
+    streetView.setPosition({lat, lng});
 
     if(displayMode)
     {
-        displayLat.value=lat;
-        displayLng.value=lng;
+        document.getElementById("displayLat").value = lat.toFixed(6);
+        document.getElementById("displayLng").value = lng.toFixed(6);
     }
 
     if(buildingMode)
     {
-        buildingLat.value=lat;
-        buildingLng.value=lng;
+        document.getElementById("buildingLat").value = lat.toFixed(6);
+        document.getElementById("buildingLng").value = lng.toFixed(6);
     }
 }
-
 
 // LOAD KML / GEOJSON
 function loadFiles(event)
@@ -130,6 +129,9 @@ function savePOI()
         name: document.getElementById("name").value,
         category: document.getElementById("category").value,
         subcategory: document.getElementById("subcategory").value,
+        landline: document.getElementById("landline").value,
+        mobile: document.getElementById("mobile").value,
+        mobile1: document.getElementById("mobile1").value,
         displayLat: document.getElementById("displayLat").value,
         displayLng: document.getElementById("displayLng").value,
         buildingLat: document.getElementById("buildingLat").value,
@@ -142,7 +144,6 @@ function savePOI()
 
     updateTable();
 }
-
 
 // UPDATE TABLE
 function updateTable()
@@ -166,7 +167,7 @@ html+=`
 <tr>
 <td>${p.name}</td>
 <td>${p.category}</td>
-<td>${p.subcat}</td>
+<td>${p.subcategory}</td>
 <td>${p.landline}</td>
 <td>${p.mobile}</td>
 <td>${p.mobile1}</td>
@@ -229,4 +230,5 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
