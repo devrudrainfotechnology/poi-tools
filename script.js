@@ -198,6 +198,52 @@ function updateTable()
     document.getElementById("poiTable").innerHTML = html;
 }
 
+async function scanText()
+{
+    const svElement = document.getElementById("streetview");
+
+    const canvas = await html2canvas(svElement);
+    const imageData = canvas.toDataURL("image/png");
+
+    const { data: { text } } = await Tesseract.recognize(
+        imageData,
+        'pan+hin+eng',
+        { logger: m => console.log(m) }
+    );
+
+    if(!text.trim()) {
+        alert("No text detected.");
+        return;
+    }
+
+    translateText(text);
+}
+async function translateText(originalText)
+{
+    try {
+        const response = await fetch("https://libretranslate.de/translate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                q: originalText,
+                source: "auto",
+                target: "en",
+                format: "text"
+            })
+        });
+
+        const data = await response.json();
+
+        alert("Detected Text:\n\n" + originalText +
+              "\n\nTranslated:\n\n" + data.translatedText);
+
+    } catch (error) {
+        console.error(error);
+        alert("Translation failed.");
+    }
+}
 
 function deletePOI(index)
 {
@@ -223,3 +269,4 @@ function clearForm()
     document.getElementById("buildingLat").value = "";
     document.getElementById("buildingLng").value = "";
 }
+
