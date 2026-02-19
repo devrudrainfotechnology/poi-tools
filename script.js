@@ -1,19 +1,12 @@
-window.onload = function()
-{
-    const saved = localStorage.getItem("pois");
-
-    if(saved)
-    {
-        pois = JSON.parse(saved);
-        updateTable();
-    }
-}
-
 let map;
 let streetView;
 let geoParser;
 let pois = [];
 
+let displayMode = false;
+let buildingMode = false;
+
+// INIT MAP
 window.initMap = function()
 {
     const center = {lat:31.1471, lng:75.3412};
@@ -32,20 +25,22 @@ window.initMap = function()
         });
 
     map.setStreetView(streetView);
-};
 
-
-    map.setStreetView(streetView);
-
-    geoParser=new geoXML3.parser({map:map,zoom:true});
+    geoParser = new geoXML3.parser({map:map,zoom:true});
 
     map.addListener("click",(event)=>handleClick(event.latLng));
-
     map.data.addListener("click",(event)=>handleClick(event.latLng));
 
     document.getElementById("fileInput")
         .addEventListener("change",loadFiles);
-}
+
+    const saved = localStorage.getItem("pois");
+    if(saved)
+    {
+        pois = JSON.parse(saved);
+        updateTable();
+    }
+};
 
 
 // HANDLE CLICK
@@ -69,23 +64,25 @@ function handleClick(latLng)
     }
 }
 
-// LOAD KML / GEOJSON
+
+// LOAD FILES
 function loadFiles(event)
 {
-    const files=event.target.files;
+    const files = event.target.files;
 
     for(let file of files)
     {
-        const reader=new FileReader();
+        const reader = new FileReader();
 
-        reader.onload=function(e)
+        reader.onload = function(e)
         {
             if(file.name.endsWith(".kml"))
+            {
                 geoParser.parseKmlString(e.target.result);
+            }
             else
             {
-                const geojson=JSON.parse(e.target.result);
-
+                const geojson = JSON.parse(e.target.result);
                 map.data.addGeoJson(geojson);
 
                 map.data.setStyle({
@@ -105,18 +102,18 @@ function loadFiles(event)
 // MODE
 function setDisplayMode()
 {
-    displayMode=true;
-    buildingMode=false;
+    displayMode = true;
+    buildingMode = false;
 }
 
 function setBuildingMode()
 {
-    displayMode=false;
-    buildingMode=true;
+    displayMode = false;
+    buildingMode = true;
 }
 
 
-// SAVE
+// SAVE POI
 function savePOI()
 {
     const name = document.getElementById("name").value.trim();
@@ -130,7 +127,6 @@ function savePOI()
     const buildingLat = document.getElementById("buildingLat").value;
     const buildingLng = document.getElementById("buildingLng").value;
 
-    // ✅ Numeric Validation
     if (mobile && !/^\d{10}$/.test(mobile))
     {
         alert("Mobile number must be exactly 10 digits.");
@@ -149,29 +145,22 @@ function savePOI()
         return;
     }
 
-    const poi =
-    {
-        name,
-        category,
-        subcategory,
-        landline,
-        mobile,
-        mobile1,
-        displayLat,
-        displayLng,
-        buildingLat,
-        buildingLng
+    const poi = {
+        name, category, subcategory,
+        landline, mobile, mobile1,
+        displayLat, displayLng,
+        buildingLat, buildingLng
     };
 
     pois.push(poi);
     localStorage.setItem("pois", JSON.stringify(pois));
 
     updateTable();
-    clearForm();   // ✅ auto clear form after save
+    clearForm();
 }
 
+
 // UPDATE TABLE
-function updateTable()
 function updateTable()
 {
     let html = `
@@ -208,6 +197,8 @@ function updateTable()
 
     document.getElementById("poiTable").innerHTML = html;
 }
+
+
 function deletePOI(index)
 {
     if(confirm("Are you sure you want to delete this POI?"))
@@ -218,24 +209,6 @@ function deletePOI(index)
     }
 }
 
-// EXPORT CSV (Excel)
-function exportCSV()
-{
-    let csv=
-"POI_NAME,CATEGORY,SUB_CAT,LANDLINE,MOBILE,MOBILE_1,DISPLAY_LAT,DISPLAY_LNG,BUILD_LAT,BUILD_LNG\n";
-
-    pois.forEach(p=>{
-csv+=`${p.name},${p.category},${p.subcat},${p.landline},${p.mobile},${p.mobile1},${p.displayLat},${p.displayLng},${p.buildingLat},${p.buildingLng}\n`;
-});
-
-    const blob=new Blob([csv],{type:"text/csv"});
-    const link=document.createElement("a");
-
-    link.href=URL.createObjectURL(blob);
-    link.download="POI_Data.csv";
-
-    link.click();
-}
 
 function clearForm()
 {
@@ -250,40 +223,3 @@ function clearForm()
     document.getElementById("buildingLat").value = "";
     document.getElementById("buildingLng").value = "";
 }
-
-
-// EXPORT KML
-function exportKML()
-{
-    let kml=
-`<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-<Document>`;
-
-    pois.forEach(p=>{
-kml+=`
-<Placemark>
-<name>${p.name}</name>
-<Point>
-<coordinates>${p.displayLng},${p.displayLat},0</coordinates>
-</Point>
-</Placemark>`;
-});
-
-kml+=`</Document></kml>`;
-
-    const blob=new Blob([kml],{type:"application/vnd.google-earth.kml+xml"});
-    const link=document.createElement("a");
-
-    link.href=URL.createObjectURL(blob);
-    link.download="POI_Data.kml";
-
-    link.click();
-}
-
-
-
-
-
-
-
