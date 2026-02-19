@@ -20,23 +20,26 @@ let pois=[];
 
 
 // INIT MAP
-function initMap()
+window.initMap = function()
 {
-    const center={lat:31.1471,lng:75.3412};
+    const center = {lat:31.1471, lng:75.3412};
 
-    map=new google.maps.Map(document.getElementById("map"),
-    {
-        center:center,
-        zoom:7
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: center,
+        zoom: 7
     });
 
-    streetView=new google.maps.StreetViewPanorama(
+    streetView = new google.maps.StreetViewPanorama(
         document.getElementById("streetview"),
         {
-            position:center,
-            pov:{heading:0,pitch:0},
+            position: center,
+            pov: {heading:0, pitch:0},
             zoom:1
         });
+
+    map.setStreetView(streetView);
+};
+
 
     map.setStreetView(streetView);
 
@@ -284,6 +287,7 @@ kml+=`</Document></kml>`;
 
     link.click();
 }
+
 
 
 
