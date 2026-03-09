@@ -41,21 +41,28 @@ window.initMap = function()
         updateTable();
     }
 };
+streetView.addListener("pano_changed", function () {
 
-function getStreetViewDate(lat, lng) {
-  const apiKey = "YOUR_API_KEY";
+    const pano = streetView.getPano();
 
-  const url = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${lat},${lng}&key=${apiKey}`;
+    const service = new google.maps.StreetViewService();
 
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === "OK"){
-            document.getElementById("captureDate").innerText =
-            "Capture Date: " + data.date;
+    service.getPanorama({ pano: pano }, function (data, status) {
+
+        if (status === "OK") {
+
+            const date = data.imageDate;   // Example: "2023-05"
+
+            if(date){
+                document.getElementById("svDate").value = date;
+            }
+
         }
+
     });
-}
+
+});
+
 // HANDLE CLICK
 function handleClick(latLng)
 {
@@ -236,4 +243,5 @@ function clearForm()
     document.getElementById("buildingLat").value = "";
     document.getElementById("buildingLng").value = "";
 }
+
 
