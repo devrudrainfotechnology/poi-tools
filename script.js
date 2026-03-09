@@ -24,6 +24,33 @@ window.initMap = function()
             zoom:1
         });
 
+    streetView.addListener("position_changed", function () {
+
+    const service = new google.maps.StreetViewService();
+
+    service.getPanorama({
+        location: streetView.getPosition(),
+        radius: 50
+    }, function(data, status) {
+
+        if (status === "OK") {
+
+            if (data.imageDate) {
+
+                document.getElementById("svDate").value = data.imageDate;
+
+            } else {
+
+                document.getElementById("svDate").value = "Date not available";
+
+            }
+
+        }
+
+    });
+
+});
+
     map.setStreetView(streetView);
 
     geoParser = new geoXML3.parser({map:map,zoom:true});
@@ -243,5 +270,6 @@ function clearForm()
     document.getElementById("buildingLat").value = "";
     document.getElementById("buildingLng").value = "";
 }
+
 
 
