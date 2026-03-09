@@ -42,7 +42,20 @@ window.initMap = function()
     }
 };
 
+function getStreetViewDate(lat, lng) {
+  const apiKey = "YOUR_API_KEY";
 
+  const url = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${lat},${lng}&key=${apiKey}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "OK"){
+            document.getElementById("captureDate").innerText =
+            "Capture Date: " + data.date;
+        }
+    });
+}
 // HANDLE CLICK
 function handleClick(latLng)
 {
@@ -223,3 +236,4 @@ function clearForm()
     document.getElementById("buildingLat").value = "";
     document.getElementById("buildingLng").value = "";
 }
+
