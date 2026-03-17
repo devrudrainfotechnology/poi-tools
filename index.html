@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>POI Collection Tool</title>
+
 <meta charset="utf-8"/>
 
 <link rel="stylesheet" href="style.css">
 
 <script src="https://cdn.jsdelivr.net/gh/geocodezip/geoxml3@master/polys/geoxml3.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
 </head>
 
@@ -26,17 +27,9 @@
 <button onclick="exportExcel()">Export Excel</button>
 <button onclick="exportKML()">Export KML</button>
 
-<button onclick="detectText()">🔍 Detect Signboard</button>
-
 <div class="container">
-
-    <div style="position:relative; width:100%; height:100%;">
-        <div id="streetview"></div>
-        <canvas id="overlayCanvas"></canvas>
-    </div>
-
+    <div id="streetview"></div>
     <div id="map"></div>
-
 </div>
 
 <h2>POI Entry</h2>
@@ -53,13 +46,13 @@
 <input id="subcategory">
 
 <label>Landline:</label>
-<input id="landline" type="number">
+<input id="landline" type="number" inputmode="numeric">
 
 <label>Mobile:</label>
-<input id="mobile" type="number">
+<input id="mobile" type="number" inputmode="numeric" maxlength="10">
 
 <label>Mobile 1:</label>
-<input id="mobile1" type="number">
+<input id="mobile1" type="number" inputmode="numeric" maxlength="10">
 
 <br><br>
 
@@ -75,12 +68,17 @@
 <label>Building Lng:</label>
 <input id="buildingLng" readonly>
 
-<label>Street View Capture Date</label>
+    <label>Street View Capture Date</label>
 <input id="svDate" readonly>
 
 </div>
 
-<button class="save-btn" onclick="savePOI()">💾 SAVE POI</button>
+<div id="captureDate"></div>
+
+<!-- SAVE BUTTON BELOW FORM -->
+<div class="save-section">
+    <button class="save-btn" onclick="savePOI()">💾 SAVE POI</button>
+</div>
 
 <table border="1" id="poiTable"></table>
 
@@ -89,6 +87,17 @@
 <script src="export.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaGfh2K-DYcv-hhcObuK9ec2y0lNrlrFs&callback=initMap"></script>
-
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
