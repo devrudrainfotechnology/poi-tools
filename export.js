@@ -7,7 +7,18 @@ function exportExcel()
     }
 
     let ws_data = [
-        ["Name","Category","SubCategory","Landline","Mobile","Mobile1","Display Lat","Display Lng","Building Lat","Building Lng"]
+        [
+            "Name",
+            "Category",
+            "SubCategory",
+            "Landline",
+            "Mobile",
+            "Mobile1",
+            "Display Lat",
+            "Display Lng",
+            "Building Lat",
+            "Building Lng"
+        ]
     ];
 
     pois.forEach(p =>
