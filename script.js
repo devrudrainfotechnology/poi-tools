@@ -271,5 +271,83 @@ function clearForm()
     document.getElementById("buildingLng").value = "";
 }
 
+// ================= TEXT DETECTION =================
 
+function captureStreetView()
+{
+    const svDiv = document.getElementById("streetview");
+    const canvas = svDiv.querySelector("canvas");
+
+    if(!canvas)
+    {
+        alert("Street View not ready");
+        return null;
+    }
+
+    return canvas.toDataURL("image/png");
+}
+
+function detectText()
+{
+    const image = captureStreetView();
+
+    if(!image) return;
+
+    alert("Detecting text... please wait");
+
+    Tesseract.recognize(
+        image,
+        'eng',
+        {
+            logger: m => console.log(m)
+        }
+    ).then(({ data }) => {
+
+        drawBoxes(data.words);
+
+    }).catch(err => {
+        console.error(err);
+        alert("Detection failed");
+    });
+}
+
+function drawBoxes(words)
+{
+    const svDiv = document.getElementById("streetview");
+    const overlay = document.getElementById("overlayCanvas");
+
+    const rect = svDiv.getBoundingClientRect();
+
+    overlay.width = rect.width;
+    overlay.height = rect.height;
+
+    const ctx = overlay.getContext("2d");
+
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+    ctx.font = "12px Arial";
+    ctx.fillStyle = "yellow";
+
+    words.forEach(word => {
+
+        if(word.text.length > 2) // filter noise
+        {
+            const { x0, y0, x1, y1 } = word.bbox;
+
+            // scale to fit canvas
+            const scaleX = overlay.width / 600;
+            const scaleY = overlay.height / 400;
+
+            const x = x0 * scaleX;
+            const y = y0 * scaleY;
+            const w = (x1 - x0) * scaleX;
+            const h = (y1 - y0) * scaleY;
+
+            ctx.strokeRect(x, y, w, h);
+            ctx.fillText(word.text, x, y - 2);
+        }
+    });
+}
 
