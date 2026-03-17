@@ -287,20 +287,26 @@ function captureStreetView()
     return canvas.toDataURL("image/png");
 }
 
-function detectText()
+async function detectText()
 {
-    const image = captureStreetView();
+    const canvas = document.querySelector("#streetview canvas");
 
-    if(!image) return;
+    if (!canvas) {
+        alert("Street View not ready");
+        return;
+    }
 
-    alert("Detecting text... please wait");
+    // Use actual canvas resolution (IMPORTANT)
+    const image = canvas.toDataURL("image/png");
 
-    Tesseract.recognize(
-        image,
-        'eng',
-        {
-            logger: m => console.log(m)
-        }
+    alert("Detecting text...");
+
+    const result = await Tesseract.recognize(image, 'eng', {
+        tessedit_pageseg_mode: "6" // better for signboards
+    });
+
+    drawBoxesImproved(result.data);
+}
     ).then(({ data }) => {
 
         drawBoxes(data.words);
@@ -311,42 +317,44 @@ function detectText()
     });
 }
 
-function drawBoxes(words)
+function drawBoxesImproved(data)
 {
-    const svDiv = document.getElementById("streetview");
+    const canvasSV = document.querySelector("#streetview canvas");
     const overlay = document.getElementById("overlayCanvas");
 
-    const rect = svDiv.getBoundingClientRect();
-
-    overlay.width = rect.width;
-    overlay.height = rect.height;
+    // Match EXACT size of Street View canvas
+    overlay.width = canvasSV.width;
+    overlay.height = canvasSV.height;
 
     const ctx = overlay.getContext("2d");
-
     ctx.clearRect(0, 0, overlay.width, overlay.height);
 
     ctx.strokeStyle = "red";
     ctx.lineWidth = 2;
-    ctx.font = "12px Arial";
+    ctx.font = "14px Arial";
     ctx.fillStyle = "yellow";
 
-    words.forEach(word => {
+    data.words.forEach(word => {
 
-        if(word.text.length > 2) // filter noise
+        const text = word.text.trim();
+
+        // 🔥 FILTER (VERY IMPORTANT)
+        if (
+            text.length > 3 &&
+            /^[A-Za-z0-9 ]+$/.test(text)
+        )
         {
             const { x0, y0, x1, y1 } = word.bbox;
 
-            // scale to fit canvas
-            const scaleX = overlay.width / 600;
-            const scaleY = overlay.height / 400;
+            const w = x1 - x0;
+            const h = y1 - y0;
 
-            const x = x0 * scaleX;
-            const y = y0 * scaleY;
-            const w = (x1 - x0) * scaleX;
-            const h = (y1 - y0) * scaleY;
-
-            ctx.strokeRect(x, y, w, h);
-            ctx.fillText(word.text, x, y - 2);
+            // Ignore tiny detections
+            if (w > 30 && h > 15)
+            {
+                ctx.strokeRect(x0, y0, w, h);
+                ctx.fillText(text, x0, y0 - 5);
+            }
         }
     });
 }
